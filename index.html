@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10b981" />
+  <meta name="description" content="올인원 날짜 &amp; 띠 계산기 — 양·음력 변환, D-Day, 만 나이, 띠 대조표, 전역일" />
+  <title>올인원 날짜 & 띠 계산기</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              '"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont',
+              '"Apple SD Gothic Neo"', '"Noto Sans KR"', '"Malgun Gothic"', '"Segoe UI"',
+              'system-ui', 'sans-serif'
+            ]
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <!-- lunar-javascript (CDN, 전역 Solar/Lunar 노출) -->
+  <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.1/lunar.js"></script>
+
+  <style>
+    /* Soft entrance */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fade-up 0.35s ease-out both; }
+
+    /* Subtle scrollbar (table area) */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+
+<body class="bg-slate-100 font-sans text-slate-800 antialiased">
+  <div class="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-emerald-50/50">
+    <div class="mx-auto max-w-[640px] px-4 pb-20">
+
+      <!-- ===== 헤더 ===== -->
+      <header class="pt-8 pb-5 text-center">
+        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-500/40">
+          <i data-lucide="calendar-heart" class="w-7 h-7"></i>
+        </div>
+        <h1 class="text-2xl font-black tracking-tight text-slate-800">올인원 날짜 &amp; 띠 계산기</h1>
+        <p class="mt-1.5 text-sm font-medium text-slate-500">양·음력 변환 · D-Day · 만 나이 · 띠 대조표 · 전역일</p>
+        <div class="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/80 px-3 py-1 text-xs font-bold text-emerald-700 shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span id="today-chip"></span>
+        </div>
+      </header>
+
+      <!-- ===== 탭 바 ===== -->
+      <nav role="tablist" aria-label="기능 선택" class="sticky top-3 z-20 rounded-2xl border border-white/60 bg-white/90 p-1.5 shadow-lg shadow-slate-200/60 backdrop-blur">
+        <div class="grid grid-cols-5 gap-1">
+          <button type="button" role="tab" data-tab="solar" class="tab-btn">
+            <i data-lucide="sun" class="w-[18px] h-[18px]"></i>
+            <span class="text-[10.5px] font-bold leading-none">양/음력</span>
+          </button>
+          <button type="button" role="tab" data-tab="dday" class="tab-btn">
+            <i data-lucide="calendar-days" class="w-[18px] h-[18px]"></i>
+            <span class="text-[10.5px] font-bold leading-none">날짜 계산</span>
+          </button>
+          <button type="button" role="tab" data-tab="age" class="tab-btn">
+            <i data-lucide="cake" class="w-[18px] h-[18px]"></i>
+            <span class="text-[10.5px] font-bold leading-none">만 나이/띠</span>
+          </button>
+          <button type="button" role="tab" data-tab="zodiac" class="tab-btn">
+            <i data-lucide="table" class="w-[18px] h-[18px]"></i>
+            <span class="text-[10.5px] font-bold leading-none">띠 대조표</span>
+          </button>
+          <button type="button" role="tab" data-tab="military" class="tab-btn">
+            <i data-lucide="shield-check" class="w-[18px] h-[18px]"></i>
+            <span class="text-[10.5px] font-bold leading-none">전역일</span>
+          </button>
+        </div>
+      </nav>
+
+      <main>
+        <!-- ===== 탭 1: 양력/음력 변환 ===== -->
+        <section id="panel-solar" class="tab-panel mt-5 hidden">
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <i data-lucide="sun" class="w-[17px] h-[17px] text-emerald-500"></i>양력 / 음력 변환
+            </h2>
+
+            <div class="grid gap-1 rounded-xl bg-slate-100 p-1" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              <button type="button" role="tab" data-seg="sl-mode" data-value="solar2lunar">
+                <i data-lucide="sun" class="w-4 h-4"></i>양력 → 음력
+              </button>
+              <button type="button" role="tab" data-seg="sl-mode" data-value="lunar2solar">
+                <i data-lucide="moon" class="w-4 h-4"></i>음력 → 양력
+              </button>
+            </div>
+
+            <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">날짜 선택</label>
+            <div class="flex gap-2">
+              <input id="sl-date" type="date"
+                class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <button type="button" id="sl-today"
+                class="shrink-0 rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-600 transition-all duration-200 hover:bg-emerald-100 active:scale-95">오늘</button>
+            </div>
+
+            <label id="sl-leap-wrap"
+              class="mt-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition hover:border-amber-300 hover:bg-amber-50/60"
+              style="display:none">
+              <input id="sl-leap" type="checkbox" class="h-4 w-4 accent-amber-500" />
+              <span class="text-sm font-semibold text-slate-700">윤달 (음력)</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">윤달 변환</span>
+            </label>
+
+            <div id="sl-result"></div>
+
+            <p class="mt-4 flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-400">
+              <i data-lucide="info" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i>
+              음력은 29~30일로 구성되며, 윤달이 있는 해에만 윤달 변환이 가능합니다. (lunar-javascript 기반)
+            </p>
+          </div>
+        </section>
+
+        <!-- ===== 탭 2: 날짜 / D-Day ===== -->
+        <section id="panel-dday" class="tab-panel mt-5 hidden">
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <i data-lucide="calendar-days" class="w-[17px] h-[17px] text-emerald-500"></i>날짜 / D-Day 계산
+            </h2>
+
+            <div class="grid gap-1 rounded-xl bg-slate-100 p-1" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              <button type="button" role="tab" data-seg="dd-mode" data-value="add">
+                <i data-lucide="calendar-plus" class="w-4 h-4"></i>날짜 더하기
+              </button>
+              <button type="button" role="tab" data-seg="dd-mode" data-value="dday">
+                <i data-lucide="timer" class="w-4 h-4"></i>D-Day 계산
+              </button>
+            </div>
+
+            <div id="dd-add">
+              <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1.5 block text-xs font-semibold text-slate-500">기준 날짜</label>
+                  <input id="dd-base" type="date"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-semibold text-slate-500">더할 일수</label>
+                  <input id="dd-days" type="number"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button type="button" data-days="30" class="dd-chip">+30일</button>
+                <button type="button" data-days="100" class="dd-chip">+100일</button>
+                <button type="button" data-days="365" class="dd-chip">+365일</button>
+                <button type="button" data-days="1000" class="dd-chip">+1000일</button>
+                <button type="button" data-days="-30" class="dd-chip">-30일</button>
+              </div>
+              <div id="dd-add-result"></div>
+            </div>
+
+            <div id="dd-dday" class="hidden">
+              <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">목표 날짜 (기념일)</label>
+              <input id="dd-target" type="date"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <div id="dd-dday-result"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 탭 3: 만 나이 / 띠 ===== -->
+        <section id="panel-age" class="tab-panel mt-5 hidden">
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <i data-lucide="cake" class="w-[17px] h-[17px] text-emerald-500"></i>만 나이 &amp; 띠 정보
+            </h2>
+            <label class="mb-1.5 block text-xs font-semibold text-slate-500">생년월일</label>
+            <input id="age-birth" type="date"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+            <div id="age-result"></div>
+          </div>
+        </section>
+
+        <!-- ===== 탭 4: 띠별 생년/나이 대조표 ===== -->
+        <section id="panel-zodiac" class="tab-panel mt-5 hidden">
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <i data-lucide="table" class="w-[17px] h-[17px] text-emerald-500"></i>띠별 생년 · 나이 대조표
+            </h2>
+
+            <div id="zz-grid" class="grid grid-cols-4 gap-2"></div>
+
+            <div class="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100">
+              <i data-lucide="search" class="w-4 h-4 shrink-0 text-slate-400"></i>
+              <input id="zz-query" type="text"
+                class="w-full bg-transparent py-2.5 text-sm text-slate-700 outline-none placeholder:text-slate-400" />
+            </div>
+
+            <div id="zz-summary"></div>
+            <div id="zz-table"></div>
+
+            <p class="mt-4 flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-400">
+              <i data-lucide="info" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i>
+              <span id="zz-note"></span>
+            </p>
+          </div>
+        </section>
+
+        <!-- ===== 탭 5: 전역일 계산기 ===== -->
+        <section id="panel-military" class="tab-panel mt-5 hidden">
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <i data-lucide="flag" class="w-[17px] h-[17px] text-emerald-500"></i>전역일 계산기
+            </h2>
+
+            <label class="mb-1.5 block text-xs font-semibold text-slate-500">입대일</label>
+            <input id="mil-date" type="date"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+
+            <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">군별 선택</label>
+            <div id="mil-grid" class="grid grid-cols-3 gap-2"></div>
+
+            <div id="mil-result"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="mt-10 text-center text-[11px] leading-relaxed text-slate-400">
+        <p>lunar-javascript 기반 음력 변환 · 모든 계산은 브라우저에서 처리됩니다</p>
+        <p class="mt-0.5">Made with 💚 for a smarter day</p>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    /* ================================================================
+     * 날짜 유틸
+     * ================================================================ */
+    var WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+    function parseDate(str) {
+      if (!str) return null;
+      var parts = str.split('-');
+      if (parts.length !== 3) return null;
+      var y = +parts[0], m = +parts[1], d = +parts[2];
+      if (!y || !m || !d || m < 1 || m > 12 || d < 1) return null;
+      var date = new Date(y, m - 1, d);
+      if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+      return date;
+    }
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function toInputValue(date) { return date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate()); }
+    function today() { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+    function addDays(date, n) { var r = new Date(date); r.setDate(r.getDate() + n); return r; }
+    function addMonthsSafe(date, months) {
+      var r = new Date(date.getFullYear(), date.getMonth(), 1);
+      r.setMonth(r.getMonth() + months);
+      var last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+      r.setDate(Math.min(date.getDate(), last));
+      return r;
+    }
+    function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+    function weekdayOf(date) { return WEEKDAYS[date.getDay()]; }
+    function fmtLong(date) { return date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 ' + weekdayOf(date) + '요일'; }
+    function fmtDot(date) { return date.getFullYear() + '.' + pad2(date.getMonth() + 1) + '.' + pad2(date.getDate()); }
+
+    /* ================================================================
+     * 띠 데이터 & 계산
+     * ================================================================ */
+    var STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    var BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+    var STYLE = {
+      rose:    { idle: 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100',    active: 'bg-rose-500 border-rose-600 text-white shadow-lg shadow-rose-500/30' },
+      amber:   { idle: 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100', active: 'bg-amber-500 border-amber-600 text-white shadow-lg shadow-amber-500/30' },
+      orange:  { idle: 'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100', active: 'bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/30' },
+      pink:    { idle: 'bg-pink-50 border-pink-200 text-pink-700 hover:bg-pink-100',    active: 'bg-pink-500 border-pink-600 text-white shadow-lg shadow-pink-500/30' },
+      emerald: { idle: 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100', active: 'bg-emerald-500 border-emerald-600 text-white shadow-lg shadow-emerald-500/30' },
+      lime:    { idle: 'bg-lime-50 border-lime-200 text-lime-700 hover:bg-lime-100',    active: 'bg-lime-600 border-lime-700 text-white shadow-lg shadow-lime-500/30' },
+      cyan:    { idle: 'bg-cyan-50 border-cyan-200 text-cyan-700 hover:bg-cyan-100',    active: 'bg-cyan-500 border-cyan-600 text-white shadow-lg shadow-cyan-500/30' },
+      violet:  { idle: 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100', active: 'bg-violet-500 border-violet-600 text-white shadow-lg shadow-violet-500/30' },
+      yellow:  { idle: 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100', active: 'bg-yellow-500 border-yellow-600 text-white shadow-lg shadow-yellow-500/30' },
+      red:     { idle: 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100',        active: 'bg-red-500 border-red-600 text-white shadow-lg shadow-red-500/30' },
+      blue:    { idle: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100',    active: 'bg-blue-500 border-blue-600 text-white shadow-lg shadow-blue-500/30' },
+      fuchsia: { idle: 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700 hover:bg-fuchsia-100', active: 'bg-fuchsia-500 border-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/30' }
+    };
+
+    var ZODIACS = [
+      { key: 'rat',     name: '쥐',     emoji: '🐭', idle: STYLE.rose.idle,    active: STYLE.rose.active },
+      { key: 'ox',      name: '소',     emoji: '🐮', idle: STYLE.amber.idle,   active: STYLE.amber.active },
+      { key: 'tiger',   name: '호랑이', emoji: '🐯', idle: STYLE.orange.idle,  active: STYLE.orange.active },
+      { key: 'rabbit',  name: '토끼',   emoji: '🐰', idle: STYLE.pink.idle,    active: STYLE.pink.active },
+      { key: 'dragon',  name: '용',     emoji: '🐲', idle: STYLE.emerald.idle, active: STYLE.emerald.active },
+      { key: 'snake',   name: '뱀',     emoji: '🐍', idle: STYLE.lime.idle,    active: STYLE.lime.active },
+      { key: 'horse',   name: '말',     emoji: '🐴', idle: STYLE.cyan.idle,    active: STYLE.cyan.active },
+      { key: 'goat',    name: '양',     emoji: '🐑', idle: STYLE.violet.idle,  active: STYLE.violet.active },
+      { key: 'monkey',  name: '원숭이', emoji: '🐵', idle: STYLE.yellow.idle,  active: STYLE.yellow.active },
+      { key: 'rooster', name: '닭',     emoji: '🐔', idle: STYLE.red.idle,     active: STYLE.red.active },
+      { key: 'dog',     name: '개',     emoji: '🐶', idle: STYLE.blue.idle,    active: STYLE.blue.active },
+      { key: 'pig',     name: '돼지',   emoji: '🐷', idle: STYLE.fuchsia.idle, active: STYLE.fuchsia.active }
+    ];
+
+    function getZodiacByYear(year) { return ZODIACS[(((year - 4) % 12) + 12) % 12]; }
+    function getGanZhi(year) { return STEMS[(year - 4) % 10] + BRANCHES[(year - 4) % 12]; }
+
+    function getManAge(birth, now) {
+      var age = now.getFullYear() - birth.getFullYear();
+      var monthDiff = now.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age -= 1;
+      return age;
+    }
+    function getYearAge(birth, now) { return now.getFullYear() - birth.getFullYear(); }
+    function getKoreanAge(birth, now) { return getYearAge(birth, now) + 1; }
+
+    function buildZodiacRows(zodiac, currentYear, maxAge) {
+      if (maxAge === undefined) maxAge = 100;
+      var rows = [];
+      for (var manAge = 0; manAge <= maxAge; manAge += 1) {
+        var birthYear = currentYear - manAge;
+        if (getZodiacByYear(birthYear).key === zodiac.key) {
+          rows.push({ birthYear: birthYear, manAge: manAge, yearAge: currentYear - birthYear, zodiac: zodiac });
+        }
+      }
+      return rows;
+    }
+
+    /* ================================================================
+     * 음력 변환 (lunar-javascript — 브라우저 전역 Solar/Lunar)
+     * ================================================================ */
+    function isValidYmd(y, m, d) {
+      if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return false;
+      if (m < 1 || m > 12 || d < 1) return false;
+      return d <= new Date(y, m, 0).getDate();
+    }
+    function solarToLunar(y, m, d) {
+      if (typeof Solar === 'undefined' || typeof Lunar === 'undefined') throw new Error('lunar lib not loaded');
+      if (!isValidYmd(y, m, d)) throw new Error('invalid solar date');
+      var solar = Solar.fromYmd(y, m, d);
+      var lunar = solar.getLunar();
+      var lm = lunar.getMonth(); // 윤달이면 음수
+      return {
+        year: lunar.getYear(),
+        month: Math.abs(lm),
+        day: lunar.getDay(),
+        isLeap: lm < 0,
+        ganZhi: lunar.getYearInGanZhi(),
+        dayCn: lunar.getDayInChinese()
+      };
+    }
+    function lunarToSolar(y, m, d, isLeap) {
+      if (typeof Lunar === 'undefined' || typeof Solar === 'undefined') throw new Error('lunar lib not loaded');
+      if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) throw new Error('invalid');
+      if (m < 1 || m > 12 || d < 1 || d > 30) throw new Error('invalid lunar date');
+      var lunar = Lunar.fromYmd(y, m, d, !!isLeap);
+      var solar = lunar.getSolar();
+      var back = solar.getLunar();
+      if (!!isLeap !== (back.getMonth() < 0)) throw new Error('no such leap month');
+      return {
+        year: solar.getYear(),
+        month: solar.getMonth(),
+        day: solar.getDay(),
+        weekday: solar.getWeekInChinese(),
+        ganZhi: back.getYearInGanZhi(),
+        lunarYear: back.getYear()
+      };
+    }
+
+    /* ================================================================
+     * 상태
+     * ================================================================ */
+    var NOW = today();
+    var CURRENT_YEAR = NOW.getFullYear();
+
+    var state = {
+      tab: 'solar',
+      slMode: 'solar2lunar',
+      slDate: toInputValue(NOW),
+      slLeap: false,
+      ddMode: 'add',
+      ddBase: toInputValue(NOW),
+      ddDays: 100,
+      ddTarget: toInputValue(addDays(NOW, 100)),
+      ageBirth: '',
+      zzKey: getZodiacByYear(CURRENT_YEAR).key,
+      zzQuery: '',
+      milDate: toInputValue(NOW),
+      milBranch: 'army'
+    };
+
+    var BRANCHES = [
+      { key: 'army',   name: '육군',   months: 18, desc: '18개월', icon: 'shield',          idle: 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100', active: 'bg-emerald-500 border-emerald-600 text-white shadow-md shadow-emerald-500/30' },
+      { key: 'navy',   name: '해군',   months: 20, desc: '20개월', icon: 'anchor',          idle: 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100',             active: 'bg-sky-500 border-sky-600 text-white shadow-md shadow-sky-500/30' },
+      { key: 'air',    name: '공군',   months: 21, desc: '21개월', icon: 'plane',           idle: 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100',     active: 'bg-indigo-500 border-indigo-600 text-white shadow-md shadow-indigo-500/30' },
+      { key: 'marine', name: '해병대', months: 18, desc: '18개월', icon: 'ship',            idle: 'bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-100',           active: 'bg-teal-500 border-teal-600 text-white shadow-md shadow-teal-500/30' },
+      { key: 'public', name: '공익근무', months: 21, desc: '21개월', icon: 'heart-handshake', idle: 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100',      active: 'bg-amber-500 border-amber-600 text-white shadow-md shadow-amber-500/30' }
+    ];
+
+    /* ================================================================
+     * 공용 렌더 헬퍼
+     * ================================================================ */
+    function el(id) { return document.getElementById(id); }
+    function renderIcons() { if (window.lucide) lucide.createIcons(); }
+    function ICON(name, cls) { return '<i data-lucide="' + name + '" class="' + (cls || 'w-4 h-4') + '"></i>'; }
+
+    function badge(tone, text) {
+      var tones = {
+        emerald: 'bg-emerald-100 text-emerald-700',
+        amber: 'bg-amber-100 text-amber-700',
+        rose: 'bg-rose-100 text-rose-700',
+        slate: 'bg-slate-100 text-slate-600',
+        sky: 'bg-sky-100 text-sky-700'
+      };
+      return '<span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ' + (tones[tone] || tones.emerald) + '">' + text + '</span>';
+    }
+
+    function statCard(iconName, tone, label, value, sub) {
+      var tones = {
+        emerald: 'from-emerald-500 to-teal-500',
+        amber: 'from-amber-500 to-orange-500',
+        rose: 'from-rose-500 to-pink-500',
+        sky: 'from-sky-500 to-cyan-500',
+        violet: 'from-violet-500 to-purple-500'
+      };
+      return '<div class="rounded-2xl border border-slate-200/70 bg-white p-4 text-center shadow-sm">' +
+        '<div class="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md ' + (tones[tone] || tones.emerald) + '">' + ICON(iconName, 'w-[17px] h-[17px]') + '</div>' +
+        '<div class="text-2xl font-extrabold text-slate-800">' + value + '</div>' +
+        '<div class="mt-0.5 text-xs font-medium text-slate-500">' + label + '</div>' +
+        (sub ? '<div class="mt-0.5 text-[11px] text-slate-400">' + sub + '</div>' : '') +
+        '</div>';
+    }
+
+    function emptyHint(text) {
+      return '<div class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-sm font-semibold text-slate-500">' + text + '</div>';
+    }
+
+    function lunarLibErrorCard() {
+      return '<div class="animate-fade-up mt-5 flex items-start gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-600">' +
+        ICON('alert-circle', 'w-[17px] h-[17px] mt-0.5 shrink-0') +
+        '음력 계산 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.</div>';
+    }
+
+    var SEG_ACTIVE = 'flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] font-semibold transition-all duration-200 active:scale-95 bg-white text-emerald-600 shadow-sm';
+    var SEG_INACTIVE = 'flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] font-semibold transition-all duration-200 active:scale-95 text-slate-500 hover:bg-white/60 hover:text-slate-700';
+
+    function updateSegmented(group, value) {
+      var buttons = document.querySelectorAll('[data-seg="' + group + '"]');
+      for (var i = 0; i < buttons.length; i++) {
+        var btn = buttons[i];
+        btn.className = btn.dataset.value === value ? SEG_ACTIVE : SEG_INACTIVE;
+        btn.setAttribute('aria-selected', btn.dataset.value === value);
+      }
+    }
+
+    var CHIP_ACTIVE = 'rounded-full border border-emerald-500 bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-emerald-500/30 transition-all duration-200 active:scale-95';
+    var CHIP_INACTIVE = 'rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-200 active:scale-95 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700';
+
+    function updateChips() {
+      var chips = document.querySelectorAll('[data-days]');
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].className = Number(chips[i].dataset.days) === state.ddDays ? CHIP_ACTIVE : CHIP_INACTIVE;
+      }
+    }
+
+    /* ================================================================
+     * 탭 1: 양력/음력 변환
+     * ================================================================ */
+    function updateSolarResults() {
+      var slot = el('sl-result');
+      var wrap = el('sl-leap-wrap');
+
+      // 윤달 체크박스는 음력→양력 모드에서만 표시
+      wrap.style.display = (state.slMode === 'lunar2solar') ? 'flex' : 'none';
+      updateSegmented('sl-mode', state.slMode);
+
+      if (typeof Solar === 'undefined' || typeof Lunar === 'undefined') {
+        slot.innerHTML = lunarLibErrorCard();
+        renderIcons();
+        return;
+      }
+
+      var d = parseDate(state.slDate);
+      if (!d) {
+        slot.innerHTML = emptyHint('날짜를 선택해주세요 📅');
+        renderIcons();
+        return;
+      }
+
+      var y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+      try {
+        if (state.slMode === 'solar2lunar') {
+          var l = solarToLunar(y, m, day);
+          var zName = getZodiacByYear(l.year).name;
+          slot.innerHTML =
+            '<div class="animate-fade-up mt-5 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5">' +
+            '<div class="flex items-center gap-1.5 text-xs font-bold text-amber-700">' +
+            ICON('moon', 'w-3.5 h-3.5') + ' 음력 변환 결과' + (l.isLeap ? badge('amber', '윤달') : '') + '</div>' +
+            '<div class="mt-2 flex items-baseline gap-2">' +
+            '<span class="text-3xl font-black tracking-tight text-amber-900">' + l.year + '년 ' + l.month + '월 ' + l.day + '일</span>' +
+            ICON('arrow-right', 'w-4 h-4 shrink-0 text-amber-400') + '</div>' +
+            '<div class="mt-1.5 text-sm font-semibold text-amber-800">' + l.ganZhi + '년 · ' + zName + '띠 · ' + l.dayCn + '</div>' +
+            '</div>';
+        } else {
+          var s = lunarToSolar(y, m, day, state.slLeap);
+          var zName2 = getZodiacByYear(s.lunarYear).name;
+          slot.innerHTML =
+            '<div class="animate-fade-up mt-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">' +
+            '<div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700">' +
+            ICON('sun', 'w-3.5 h-3.5') + ' 양력 변환 결과</div>' +
+            '<div class="mt-2 flex items-baseline gap-2">' +
+            '<span class="text-3xl font-black tracking-tight text-emerald-900">' + s.year + '년 ' + s.month + '월 ' + s.day + '일</span>' +
+            ICON('arrow-right', 'w-4 h-4 shrink-0 text-emerald-400') + '</div>' +
+            '<div class="mt-1.5 text-sm font-semibold text-emerald-800">' + s.weekday + ' · ' + s.ganZhi + '년 ' + zName2 + '띠</div>' +
+            '</div>';
+        }
+      } catch (e) {
+        slot.innerHTML =
+          '<div class="animate-fade-up mt-5 flex items-start gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-600">' +
+          ICON('alert-circle', 'w-[17px] h-[17px] mt-0.5 shrink-0') +
+          '변환할 수 없는 날짜입니다. 윤달 여부를 다시 확인해 주세요.</div>';
+      }
+      renderIcons();
+    }
+
+    /* ================================================================
+     * 탭 2: 날짜 / D-Day
+     * ================================================================ */
+    function humanize(n) {
+      var sign = n < 0 ? '-' : '';
+      var abs = Math.abs(n);
+      var years = Math.floor(abs / 365);
+      var months = Math.floor((abs % 365) / 30);
+      var days = abs % 30;
+      var parts = [];
+      if (years > 0) parts.push(years + '년');
+      if (months > 0) parts.push(months + '개월');
+      parts.push(days + '일');
+      return sign + parts.join(' ');
+    }
+
+    function ddayBadge(n) {
+      if (n > 0) return badge('emerald', 'D-' + n);
+      if (n === 0) return badge('rose', 'D-Day 🎉');
+      return badge('slate', 'D+' + (-n));
+    }
+
+    function updateDdayResults() {
+      updateSegmented('dd-mode', state.ddMode);
+      updateChips();
+      var isAdd = state.ddMode === 'add';
+      el('dd-add').classList.toggle('hidden', !isAdd);
+      el('dd-dday').classList.toggle('hidden', isAdd);
+
+      if (isAdd) {
+        var base = parseDate(state.ddBase);
+        var slot = el('dd-add-result');
+        if (!base) { slot.innerHTML = ''; return; }
+        var target = addDays(base, state.ddDays);
+        var dFromToday = daysBetween(NOW, target);
+        var signDays = state.ddDays > 0 ? '+' : '';
+        slot.innerHTML =
+          '<div class="animate-fade-up mt-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">' +
+          '<div class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">' +
+          '<span>' + fmtDot(base) + '</span>' + ICON('arrow-right', 'w-3.5 h-3.5') + '<span>' + signDays + state.ddDays + '일</span></div>' +
+          '<div class="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">' +
+          '<span class="text-3xl font-black tracking-tight text-emerald-900">' + fmtDot(target) + '</span>' +
+          '<span class="text-sm font-bold text-emerald-600">(' + weekdayOf(target) + ')</span></div>' +
+          '<div class="mt-2 flex flex-wrap items-center gap-1.5">' +
+          '<span class="text-xs font-semibold text-emerald-700">오늘 기준</span>' + ddayBadge(dFromToday) +
+          (Math.abs(dFromToday) > 0 ? '<span class="text-[11px] text-emerald-600/80">약 ' + humanize(dFromToday) + '</span>' : '') +
+          '</div></div>';
+      } else {
+        var target2 = parseDate(state.ddTarget);
+        var slot2 = el('dd-dday-result');
+        if (!target2) { slot2.innerHTML = ''; return; }
+        var diff = daysBetween(NOW, target2);
+        var hero;
+        if (diff > 0) {
+          hero = '<div class="text-xs font-bold text-emerald-600">목표일까지</div>' +
+                 '<div class="mt-1 text-6xl font-black tracking-tight text-emerald-600">D-' + diff + '</div>';
+        } else if (diff === 0) {
+          hero = '<div class="text-xs font-bold text-rose-500">오늘이 바로 그날!</div>' +
+                 '<div class="mt-1 flex items-center justify-center gap-2 text-4xl font-black text-rose-500">D-Day ' + ICON('party-popper', 'w-8 h-8') + '</div>';
+        } else {
+          hero = '<div class="text-xs font-bold text-slate-500">이미 지난 날</div>' +
+                 '<div class="mt-1 text-6xl font-black tracking-tight text-slate-500">D+' + (-diff) + '</div>';
+        }
+        slot2.innerHTML =
+          '<div class="animate-fade-up mt-5 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 text-center">' +
+          hero +
+          '<div class="mt-3 text-sm font-semibold text-slate-600">' + fmtLong(target2) + '</div>' +
+          '<div class="mt-1 text-xs text-slate-400">오늘 ' + fmtDot(NOW) + ' 기준 · 약 ' + humanize(diff) + '</div>' +
+          '</div>';
+      }
+      renderIcons();
+    }
+
+    /* ================================================================
+     * 탭 3: 만 나이 / 띠
+     * ================================================================ */
+    function updateAgeResults() {
+      var slot = el('age-result');
+      var birth = parseDate(state.ageBirth);
+
+      if (!birth || birth > NOW) {
+        slot.innerHTML =
+          '<div class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center">' +
+          '<div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30">' + ICON('baby', 'w-7 h-7') + '</div>' +
+          '<p class="text-sm font-semibold text-slate-600">생년월일을 선택하면</p>' +
+          '<p class="mt-1 text-sm text-slate-500">나이와 띠를 계산해 드려요 🎂</p>' +
+          '</div>';
+        renderIcons();
+        return;
+      }
+
+      var manAge = getManAge(birth, NOW);
+      var yearAge = getYearAge(birth, NOW);
+      var koreanAge = getKoreanAge(birth, NOW);
+      var zodiac = getZodiacByYear(birth.getFullYear());
+      var ganZhi = getGanZhi(birth.getFullYear());
+      var daysAlive = daysBetween(birth, NOW);
+
+      slot.innerHTML =
+        '<div class="animate-fade-up mt-5 space-y-4">' +
+        '<div class="grid grid-cols-3 gap-3">' +
+        statCard('sparkles', 'emerald', '만 나이', manAge + '세') +
+        statCard('calendar', 'sky', '연 나이', yearAge + '세') +
+        statCard('heart', 'rose', '세는 나이', koreanAge + '세') +
+        '</div>' +
+        '<div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5">' +
+        '<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border text-4xl ' + zodiac.idle + '">' + zodiac.emoji + '</div>' +
+        '<div class="min-w-0">' +
+        '<div class="flex flex-wrap items-center gap-2">' +
+        '<span class="text-lg font-extrabold text-slate-800">' + zodiac.name + '띠</span>' + badge('amber', ganZhi + '년') +
+        '</div>' +
+        '<div class="mt-1 text-sm text-slate-500">' + birth.getFullYear() + '년생 · 태어난 지 <b class="text-slate-700">' + daysAlive.toLocaleString('ko-KR') + '일</b></div>' +
+        '</div></div>' +
+        '<p class="flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-400">' +
+        ICON('info', 'w-3.5 h-3.5 mt-0.5 shrink-0') +
+        '입춘·설날 경계가 아닌 <b>태어난 해(양력)</b>를 기준으로 띠와 나이를 계산합니다.</p>' +
+        '</div>';
+      renderIcons();
+    }
+
+    /* ================================================================
+     * 탭 4: 띠별 생년/나이 대조표
+     * ================================================================ */
+    function updateZodiacButtons() {
+      for (var i = 0; i < ZODIACS.length; i++) {
+        var z = ZODIACS[i];
+        var btn = el('zz-btn-' + z.key);
+        if (!btn) continue;
+        var active = state.zzKey === z.key;
+        btn.className = 'flex flex-col items-center gap-0.5 rounded-xl border px-1 py-2.5 transition-all duration-200 active:scale-95 ' + (active ? z.active : z.idle);
+        btn.setAttribute('aria-pressed', active);
+      }
+    }
+
+    function updateZodiacResults() {
+      updateZodiacButtons();
+
+      var zodiac = null;
+      for (var i = 0; i < ZODIACS.length; i++) { if (ZODIACS[i].key === state.zzKey) { zodiac = ZODIACS[i]; break; } }
+      var rows = buildZodiacRows(zodiac, CURRENT_YEAR);
+      var q = state.zzQuery.trim();
+      var filtered;
+      if (!q) {
+        filtered = rows;
+      } else {
+        filtered = [];
+        for (var j = 0; j < rows.length; j++) {
+          var r = rows[j];
+          if (String(r.birthYear).indexOf(q) >= 0 || String(r.manAge) === q || String(r.yearAge) === q) filtered.push(r);
+        }
+      }
+      var latest = rows.length > 0 ? rows[0] : null;
+
+      el('zz-summary').innerHTML =
+        '<div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">' +
+        '<div class="flex items-center gap-2 text-sm font-bold text-emerald-800">' +
+        '<span class="text-xl leading-none">' + zodiac.emoji + '</span>' + zodiac.name + '띠 · ' + CURRENT_YEAR + '년 기준</div>' +
+        (latest ? badge('emerald', '최근 출생 ' + latest.birthYear + '년 (만 ' + latest.manAge + '세)') : '') +
+        '</div>';
+
+      if (filtered.length > 0) {
+        var rowsHtml = '';
+        for (var k = 0; k < filtered.length; k++) {
+          var row = filtered[k];
+          rowsHtml +=
+            '<tr class="transition-colors hover:bg-emerald-50/40">' +
+            '<td class="px-4 py-2.5 font-extrabold text-slate-800">' + row.birthYear + '<span class="ml-0.5 text-[11px] font-medium text-slate-400">년</span></td>' +
+            '<td class="py-2.5 text-center"><span class="inline-flex min-w-[56px] items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">' + row.manAge + '세</span></td>' +
+            '<td class="py-2.5 text-center text-slate-600">' + row.yearAge + '세</td>' +
+            '<td class="py-2.5 pr-4 text-right"><span class="text-xs font-semibold text-slate-600">' + zodiac.emoji + ' ' + zodiac.name + '띠</span></td>' +
+            '</tr>';
+        }
+        el('zz-table').innerHTML =
+          '<div class="mt-4 max-h-96 overflow-y-auto rounded-2xl border border-slate-200">' +
+          '<table class="w-full text-sm">' +
+          '<thead class="sticky top-0 z-10 bg-slate-50 text-xs text-slate-500">' +
+          '<tr>' +
+          '<th class="px-4 py-2.5 text-left font-bold">년생</th>' +
+          '<th class="py-2.5 text-center font-bold">만 나이</th>' +
+          '<th class="py-2.5 text-center font-bold">연 나이</th>' +
+          '<th class="py-2.5 pr-4 text-right font-bold">띠</th>' +
+          '</tr></thead>' +
+          '<tbody class="divide-y divide-slate-100 bg-white">' + rowsHtml + '</tbody>' +
+          '</table></div>';
+      } else {
+        el('zz-table').innerHTML =
+          '<div class="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-sm text-slate-500">검색 결과가 없습니다 🕵️</div>';
+      }
+      renderIcons();
+    }
+
+    /* ================================================================
+     * 탭 5: 전역일 계산기
+     * ================================================================ */
+    function updateBranchButtons() {
+      for (var i = 0; i < BRANCHES.length; i++) {
+        var b = BRANCHES[i];
+        var btn = el('mil-btn-' + b.key);
+        if (!btn) continue;
+        var active = state.milBranch === b.key;
+        btn.className = 'flex flex-col items-center gap-1 rounded-xl border px-2 py-3 transition-all duration-200 active:scale-95 ' + (active ? b.active : b.idle);
+        btn.setAttribute('aria-pressed', active);
+      }
+    }
+
+    function updateMilitaryResults() {
+      updateBranchButtons();
+
+      var enlist = parseDate(state.milDate);
+      var slot = el('mil-result');
+      if (!enlist) { slot.innerHTML = ''; return; }
+
+      var branch = null;
+      for (var i = 0; i < BRANCHES.length; i++) { if (BRANCHES[i].key === state.milBranch) { branch = BRANCHES[i]; break; } }
+
+      var discharge = addMonthsSafe(enlist, branch.months);
+      var total = Math.max(1, daysBetween(enlist, discharge));
+      var served = Math.max(0, daysBetween(enlist, NOW));
+      var remaining = daysBetween(NOW, discharge);
+      var pct = Math.min(100, Math.max(0, Math.round((served / total) * 100)));
+      var status = NOW < enlist ? 'before' : (NOW >= discharge ? 'done' : 'serving');
+
+      var mainHtml;
+      if (status === 'done') {
+        mainHtml =
+          '<div class="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5">' +
+          '<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">' + ICON('party-popper', 'w-6 h-6') + '</div>' +
+          '<div>' +
+          '<div class="text-lg font-extrabold text-emerald-700">전역 완료! 🎉</div>' +
+          '<div class="text-sm text-emerald-600">' + fmtLong(discharge) + '에 전역하셨어요.</div>' +
+          '</div></div>';
+      } else {
+        mainHtml =
+          '<div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5">' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-xs font-bold text-slate-500">전역 예정일</span>' +
+          (status === 'before' ? badge('sky', '입대 전') : badge('emerald', '복무 중')) +
+          '</div>' +
+          '<div class="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">' +
+          '<span class="text-3xl font-black tracking-tight text-slate-800">' + fmtDot(discharge) + '</span>' +
+          '<span class="text-sm font-semibold text-slate-500">(' + weekdayOf(discharge) + ')</span>' +
+          (status === 'serving' ? badge('emerald', 'D-' + remaining) : '') +
+          '</div>' +
+          '<div class="mt-4">' +
+          '<div class="mb-1.5 flex items-center justify-between text-xs font-bold">' +
+          '<span class="text-slate-500">복무 진행률</span>' +
+          '<span class="text-emerald-600">' + pct + '%</span>' +
+          '</div>' +
+          '<div class="h-4 w-full overflow-hidden rounded-full bg-slate-100">' +
+          '<div class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 transition-all duration-700" style="width:' + pct + '%"></div>' +
+          '</div>' +
+          (status === 'before' ? '<p class="mt-1.5 text-[11px] text-slate-400">아직 입대 전이에요. 입대일부터 진행률이 계산됩니다.</p>' : '') +
+          '</div></div>';
+      }
+
+      slot.innerHTML =
+        '<div class="animate-fade-up mt-5 space-y-4">' + mainHtml +
+        '<div class="grid grid-cols-3 gap-3">' +
+        statCard('calendar', 'sky', '총 복무일', total.toLocaleString('ko-KR'), '일') +
+        statCard('timer', 'emerald', '경과일', served.toLocaleString('ko-KR'), '일') +
+        statCard('clock', remaining < 0 ? 'rose' : 'amber', remaining < 0 ? '전역 후 일수' : '남은 일수', Math.abs(remaining).toLocaleString('ko-KR'), '일') +
+        '</div></div>';
+      renderIcons();
+    }
+
+    /* ================================================================
+     * 탭 전환
+     * ================================================================ */
+    var TAB_ACTIVE = 'flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 transition-all duration-200 active:scale-95 bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/30';
+    var TAB_INACTIVE = 'flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 transition-all duration-200 active:scale-95 text-slate-500 hover:bg-slate-100 hover:text-slate-700';
+
+    function updateCurrentResults() {
+      switch (state.tab) {
+        case 'solar': updateSolarResults(); break;
+        case 'dday': updateDdayResults(); break;
+        case 'age': updateAgeResults(); break;
+        case 'zodiac': updateZodiacResults(); break;
+        case 'military': updateMilitaryResults(); break;
+      }
+    }
+
+    function switchTab(key) {
+      state.tab = key;
+      var tabButtons = document.querySelectorAll('.tab-btn');
+      for (var i = 0; i < tabButtons.length; i++) {
+        var btn = tabButtons[i];
+        var active = btn.dataset.tab === key;
+        btn.className = active ? TAB_ACTIVE : TAB_INACTIVE;
+        btn.setAttribute('aria-selected', active);
+      }
+      var panels = document.querySelectorAll('.tab-panel');
+      for (var j = 0; j < panels.length; j++) {
+        var panel = panels[j];
+        var show = panel.id === 'panel-' + key;
+        if (show) {
+          panel.classList.remove('hidden');
+          panel.classList.remove('animate-fade-up');
+          void panel.offsetWidth; // 애니메이션 재실행
+          panel.classList.add('animate-fade-up');
+        } else {
+          panel.classList.add('hidden');
+        }
+      }
+      updateCurrentResults();
+    }
+
+    /* ================================================================
+     * 초기화
+     * ================================================================ */
+    function buildZodiacGrid() {
+      var html = '';
+      for (var i = 0; i < ZODIACS.length; i++) {
+        var z = ZODIACS[i];
+        html +=
+          '<button type="button" id="zz-btn-' + z.key + '" data-zkey="' + z.key + '" class="flex flex-col items-center gap-0.5 rounded-xl border px-1 py-2.5 transition-all duration-200 active:scale-95 ' + z.idle + '">' +
+          '<span class="text-2xl leading-none">' + z.emoji + '</span>' +
+          '<span class="text-xs font-bold leading-none">' + z.name + '</span>' +
+          '</button>';
+      }
+      el('zz-grid').innerHTML = html;
+    }
+
+    function buildBranchGrid() {
+      var html = '';
+      for (var i = 0; i < BRANCHES.length; i++) {
+        var b = BRANCHES[i];
+        html +=
+          '<button type="button" id="mil-btn-' + b.key + '" data-bkey="' + b.key + '" class="flex flex-col items-center gap-1 rounded-xl border px-2 py-3 transition-all duration-200 active:scale-95 ' + b.idle + '">' +
+          ICON(b.icon, 'w-5 h-5') +
+          '<span class="text-sm font-extrabold leading-none">' + b.name + '</span>' +
+          '<span class="text-[10px] font-semibold opacity-80">' + b.desc + '</span>' +
+          '</button>';
+      }
+      el('mil-grid').innerHTML = html;
+    }
+
+    function bindEvents() {
+      // 탭 바
+      var tabButtons = document.querySelectorAll('.tab-btn');
+      for (var i = 0; i < tabButtons.length; i++) {
+        (function (btn) {
+          btn.addEventListener('click', function () { switchTab(btn.dataset.tab); });
+        })(tabButtons[i]);
+      }
+
+      // 탭 1: 양/음력
+      var slSeg = document.querySelectorAll('[data-seg="sl-mode"]');
+      for (var j = 0; j < slSeg.length; j++) {
+        (function (btn) {
+          btn.addEventListener('click', function () { state.slMode = btn.dataset.value; updateSolarResults(); });
+        })(slSeg[j]);
+      }
+      el('sl-date').addEventListener('change', function (e) { state.slDate = e.target.value; updateSolarResults(); });
+      el('sl-today').addEventListener('click', function () {
+        state.slDate = toInputValue(today());
+        el('sl-date').value = state.slDate;
+        updateSolarResults();
+      });
+      el('sl-leap').addEventListener('change', function (e) { state.slLeap = e.target.checked; updateSolarResults(); });
+
+      // 탭 2: 날짜/D-Day
+      var ddSeg = document.querySelectorAll('[data-seg="dd-mode"]');
+      for (var k = 0; k < ddSeg.length; k++) {
+        (function (btn) {
+          btn.addEventListener('click', function () { state.ddMode = btn.dataset.value; updateDdayResults(); });
+        })(ddSeg[k]);
+      }
+      el('dd-base').addEventListener('change', function (e) { state.ddBase = e.target.value; updateDdayResults(); });
+      el('dd-days').addEventListener('input', function (e) { state.ddDays = Number(e.target.value) || 0; updateDdayResults(); });
+      var chips = document.querySelectorAll('[data-days]');
+      for (var c = 0; c < chips.length; c++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            state.ddDays = Number(btn.dataset.days);
+            el('dd-days').value = state.ddDays;
+            updateDdayResults();
+          });
+        })(chips[c]);
+      }
+      el('dd-target').addEventListener('change', function (e) { state.ddTarget = e.target.value; updateDdayResults(); });
+
+      // 탭 3: 만 나이/띠
+      el('age-birth').addEventListener('change', function (e) { state.ageBirth = e.target.value; updateAgeResults(); });
+
+      // 탭 4: 띠 대조표
+      var zzBtns = document.querySelectorAll('[data-zkey]');
+      for (var zz = 0; zz < zzBtns.length; zz++) {
+        (function (btn) {
+          btn.addEventListener('click', function () { state.zzKey = btn.dataset.zkey; updateZodiacResults(); });
+        })(zzBtns[zz]);
+      }
+      el('zz-query').addEventListener('input', function (e) { state.zzQuery = e.target.value; updateZodiacResults(); });
+
+      // 탭 5: 전역일
+      var milBtns = document.querySelectorAll('[data-bkey]');
+      for (var mb = 0; mb < milBtns.length; mb++) {
+        (function (btn) {
+          btn.addEventListener('click', function () { state.milBranch = btn.dataset.bkey; updateMilitaryResults(); });
+        })(milBtns[mb]);
+      }
+      el('mil-date').addEventListener('change', function (e) { state.milDate = e.target.value; updateMilitaryResults(); });
+    }
+
+    function init() {
+      // 헤더 오늘 정보
+      var yz = getZodiacByYear(CURRENT_YEAR);
+      el('today-chip').textContent = '오늘 ' + fmtLong(NOW) + ' · ' + yz.emoji + ' ' + yz.name + '띠해 (' + getGanZhi(CURRENT_YEAR) + '년)';
+
+      // 초기 입력값
+      el('sl-date').value = state.slDate;
+      el('dd-base').value = state.ddBase;
+      el('dd-days').value = state.ddDays;
+      el('dd-target').value = state.ddTarget;
+      el('age-birth').max = toInputValue(NOW);
+      el('mil-date').value = state.milDate;
+      el('zz-query').placeholder = CURRENT_YEAR + '년 기준 년생·나이 검색 (예: 1996)';
+      el('zz-note').textContent = CURRENT_YEAR + '년(올해)을 기준으로 만 0세 ~ 100세의 출생 연도를 계산합니다. 띠는 태어난 해(양력) 기준입니다.';
+
+      buildZodiacGrid();
+      buildBranchGrid();
+      bindEvents();
+
+      switchTab('solar');
+      renderIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

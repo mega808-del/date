@@ -1,0 +1,29 @@
+{
+  "name": "date-zodiac-calculator",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "올인원 날짜 & 띠 계산기 — 양·음력 변환, D-Day, 만 나이, 띠 대조표, 전역일",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.469.0",
+    "lunar-javascript": "^1.7.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.11",
+    "vite-plugin-singlefile": "^2.0.3"
+  }
+}

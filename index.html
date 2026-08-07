@@ -109,8 +109,18 @@
 
             <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">날짜 선택</label>
             <div class="flex gap-2">
-              <input id="sl-date" type="date"
-                class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <div class="relative min-w-0 flex-1">
+                <input id="sl-date" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="예: 1995-05-20"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-20 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                <button type="button" data-reset-for="sl-date" aria-label="입력 지우기" title="지우기"
+                  class="absolute right-[42px] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-rose-50 hover:text-rose-500 active:scale-90 hidden">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-date-trigger="sl-date" aria-label="달력에서 날짜 선택" title="달력 열기"
+                  class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90">
+                  <i data-lucide="calendar" class="w-[17px] h-[17px]"></i>
+                </button>
+              </div>
               <button type="button" id="sl-today"
                 class="shrink-0 rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-600 transition-all duration-200 hover:bg-emerald-100 active:scale-95">오늘</button>
             </div>
@@ -152,8 +162,18 @@
               <div class="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-xs font-semibold text-slate-500">기준 날짜</label>
-                  <input id="dd-base" type="date"
-                    class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                  <div class="relative">
+                    <input id="dd-base" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="예: 1995-05-20"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-20 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                    <button type="button" data-reset-for="dd-base" aria-label="입력 지우기" title="지우기"
+                      class="absolute right-[42px] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-rose-50 hover:text-rose-500 active:scale-90 hidden">
+                      <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" data-date-trigger="dd-base" aria-label="달력에서 날짜 선택" title="달력 열기"
+                      class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90">
+                      <i data-lucide="calendar" class="w-[17px] h-[17px]"></i>
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label class="mb-1.5 block text-xs font-semibold text-slate-500">더할 일수</label>
@@ -173,8 +193,18 @@
 
             <div id="dd-dday" class="hidden">
               <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">목표 날짜 (기념일)</label>
-              <input id="dd-target" type="date"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <div class="relative">
+                <input id="dd-target" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="예: 1995-05-20"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-20 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+                <button type="button" data-reset-for="dd-target" aria-label="입력 지우기" title="지우기"
+                  class="absolute right-[42px] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-rose-50 hover:text-rose-500 active:scale-90 hidden">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-date-trigger="dd-target" aria-label="달력에서 날짜 선택" title="달력 열기"
+                  class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90">
+                  <i data-lucide="calendar" class="w-[17px] h-[17px]"></i>
+                </button>
+              </div>
               <div id="dd-dday-result"></div>
             </div>
           </div>
@@ -187,8 +217,18 @@
               <i data-lucide="cake" class="w-[17px] h-[17px] text-emerald-500"></i>만 나이 &amp; 띠 정보
             </h2>
             <label class="mb-1.5 block text-xs font-semibold text-slate-500">생년월일</label>
-            <input id="age-birth" type="date"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+            <div class="relative">
+              <input id="age-birth" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="예: 1995-05-20"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-20 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <button type="button" data-reset-for="age-birth" aria-label="입력 지우기" title="지우기"
+                class="absolute right-[42px] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-rose-50 hover:text-rose-500 active:scale-90 hidden">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+              <button type="button" data-date-trigger="age-birth" aria-label="달력에서 날짜 선택" title="달력 열기"
+                class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90">
+                <i data-lucide="calendar" class="w-[17px] h-[17px]"></i>
+              </button>
+            </div>
             <div id="age-result"></div>
           </div>
         </section>
@@ -208,6 +248,7 @@
                 class="w-full bg-transparent py-2.5 text-sm text-slate-700 outline-none placeholder:text-slate-400" />
             </div>
 
+            <div id="zz-live"></div>
             <div id="zz-summary"></div>
             <div id="zz-table"></div>
 
@@ -226,8 +267,18 @@
             </h2>
 
             <label class="mb-1.5 block text-xs font-semibold text-slate-500">입대일</label>
-            <input id="mil-date" type="date"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+            <div class="relative">
+              <input id="mil-date" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="예: 1995-05-20"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-20 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+              <button type="button" data-reset-for="mil-date" aria-label="입력 지우기" title="지우기"
+                class="absolute right-[42px] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-rose-50 hover:text-rose-500 active:scale-90 hidden">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+              <button type="button" data-date-trigger="mil-date" aria-label="달력에서 날짜 선택" title="달력 열기"
+                class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90">
+                <i data-lucide="calendar" class="w-[17px] h-[17px]"></i>
+              </button>
+            </div>
 
             <label class="mb-1.5 mt-5 block text-xs font-semibold text-slate-500">군별 선택</label>
             <div id="mil-grid" class="grid grid-cols-3 gap-2"></div>
@@ -240,6 +291,7 @@
       <footer class="mt-10 text-center text-[11px] leading-relaxed text-slate-400">
         <p>lunar-javascript 기반 음력 변환 · 모든 계산은 브라우저에서 처리됩니다</p>
         <p class="mt-0.5">Made with 💚 for a smarter day</p>
+        <p class="mt-2 text-[#999999]">Created by Seong Hyo</p>
       </footer>
     </div>
   </div>
@@ -279,10 +331,166 @@
     function fmtDot(date) { return date.getFullYear() + '.' + pad2(date.getMonth() + 1) + '.' + pad2(date.getDate()); }
 
     /* ================================================================
+     * 유연한 날짜 입력 (직접 타이핑 + 달력 팝업 공용)
+     *  - YYYY-MM-DD / YYYYMMDD / YYYY.M.D 등 다양한 형태 허용
+     *  - 타이핑 중 자동으로 YYYY-MM-DD 형태로 정리
+     * ================================================================ */
+    function formatDateInput(raw) {
+      var d = String(raw || '').replace(/\D/g, '').slice(0, 8);
+      if (d.length <= 4) return d;
+      if (d.length <= 6) return d.slice(0, 4) + '-' + d.slice(4);
+      return d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6, 8);
+    }
+
+    function parseFlexible(str) {
+      if (!str) return null;
+      var s = String(str).trim();
+      var compact = s.replace(/[-./\s]/g, '');
+      if (/^\d{8}$/.test(compact)) {
+        return parseDate(compact.slice(0, 4) + '-' + compact.slice(4, 6) + '-' + compact.slice(6, 8));
+      }
+      return parseDate(s);
+    }
+
+    var DATE_COMMITS = {};
+
+    function bindFlexDate(inputId, commit) {
+      DATE_COMMITS[inputId] = commit;
+      var input = el(inputId);
+      input.addEventListener('input', function (e) {
+        var v = formatDateInput(e.target.value);
+        if (v !== e.target.value) e.target.value = v;
+        var d = parseFlexible(v);
+        commit(d ? toInputValue(d) : v);
+        toggleResetBtn(inputId, v !== '');
+      });
+    }
+
+    function toggleResetBtn(inputId, show) {
+      var btn = document.querySelector('[data-reset-for="' + inputId + '"]');
+      if (btn) btn.classList.toggle('hidden', !show);
+    }
+
+    /* ---- 달력 팝업 (공용) ---- */
+    var DPK_EL = null;
+    var DPK = null;
+
+    function ensureDpkEl() {
+      if (DPK_EL) return;
+      DPK_EL = document.createElement('div');
+      DPK_EL.className = 'fixed z-50 w-[280px] rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-400/30';
+      DPK_EL.style.display = 'none';
+      document.body.appendChild(DPK_EL);
+      DPK_EL.addEventListener('click', function (e) {
+        var t = e.target.closest('[data-dpk]');
+        if (!t) return;
+        var act = t.dataset.dpk;
+        if (act === 'prev') {
+          DPK.m -= 1; if (DPK.m < 0) { DPK.m = 11; DPK.y -= 1; }
+          DPK_EL.innerHTML = dpkInner(); renderIcons();
+        } else if (act === 'next') {
+          DPK.m += 1; if (DPK.m > 11) { DPK.m = 0; DPK.y += 1; }
+          DPK_EL.innerHTML = dpkInner(); renderIcons();
+        } else if (act === 'day') {
+          selectDpkDate(DPK.y, DPK.m, parseInt(t.dataset.d, 10));
+        } else if (act === 'today') {
+          var td = today();
+          DPK.y = td.getFullYear(); DPK.m = td.getMonth();
+          DPK_EL.innerHTML = dpkInner(); renderIcons();
+        } else if (act === 'close') {
+          closeDatepicker();
+        }
+      });
+    }
+
+    function dpkInner() {
+      var y = DPK.y, m = DPK.m;
+      var first = new Date(y, m, 1);
+      var startDow = first.getDay();
+      var dim = new Date(y, m + 1, 0).getDate();
+      var sel = parseFlexible(el(DPK.inputId).value);
+      var t = today();
+      var todayY = t.getFullYear(), todayM = t.getMonth(), todayD = t.getDate();
+      var wd = ['일', '월', '화', '수', '목', '금', '토'];
+      var h = '';
+      h += '<div class="mb-2 flex items-center justify-between">';
+      h += '<button type="button" data-dpk="prev" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 active:scale-90" aria-label="이전 달">' + ICON('chevron-left', 'w-4 h-4') + '</button>';
+      h += '<div class="text-sm font-extrabold text-slate-800">' + y + '년 ' + (m + 1) + '월</div>';
+      h += '<button type="button" data-dpk="next" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 active:scale-90" aria-label="다음 달">' + ICON('chevron-right', 'w-4 h-4') + '</button>';
+      h += '</div>';
+      h += '<div class="mb-1 grid grid-cols-7 text-center text-[11px] font-bold">';
+      for (var i = 0; i < 7; i++) {
+        h += '<div class="py-1 ' + (i === 0 ? 'text-rose-400' : i === 6 ? 'text-sky-400' : 'text-slate-400') + '">' + wd[i] + '</div>';
+      }
+      h += '</div>';
+      h += '<div class="grid grid-cols-7 gap-y-0.5 text-center">';
+      for (var j = 0; j < startDow; j++) h += '<div></div>';
+      for (var d = 1; d <= dim; d++) {
+        var isToday = (y === todayY && m === todayM && d === todayD);
+        var isSel = !!sel && sel.getFullYear() === y && sel.getMonth() === m && sel.getDate() === d;
+        var cls = 'flex h-9 items-center justify-center rounded-lg text-sm font-semibold transition-all duration-150 ';
+        if (isSel) cls += 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30';
+        else if (isToday) cls += 'border border-emerald-300 bg-emerald-50 text-emerald-600';
+        else cls += 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700';
+        h += '<button type="button" data-dpk="day" data-d="' + d + '" class="' + cls + '">' + d + '</button>';
+      }
+      h += '</div>';
+      h += '<div class="mt-2 flex items-center justify-between border-t border-slate-100 pt-2">';
+      h += '<button type="button" data-dpk="today" class="rounded-lg px-2.5 py-1.5 text-xs font-bold text-emerald-600 transition hover:bg-emerald-50 active:scale-95">오늘로 이동</button>';
+      h += '<button type="button" data-dpk="close" class="rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-400 transition hover:bg-slate-100 active:scale-95">닫기</button>';
+      h += '</div>';
+      return h;
+    }
+
+    function positionDpk() {
+      if (!DPK) return;
+      var rect = DPK.input.getBoundingClientRect();
+      var w = 280, pad = 8, estH = 350;
+      var left = Math.max(pad, Math.min(rect.left, window.innerWidth - w - pad));
+      var top = rect.bottom + 6;
+      if (top + estH > window.innerHeight - pad) top = Math.max(pad, rect.top - estH - 6);
+      DPK_EL.style.left = left + 'px';
+      DPK_EL.style.top = top + 'px';
+    }
+
+    function openDatepicker(inputId) {
+      ensureDpkEl();
+      var input = el(inputId);
+      var d = parseFlexible(input.value) || today();
+      DPK = { inputId: inputId, input: input, y: d.getFullYear(), m: d.getMonth() };
+      DPK_EL.innerHTML = dpkInner();
+      DPK_EL.style.display = 'block';
+      positionDpk();
+      renderIcons();
+    }
+
+    function closeDatepicker() {
+      if (DPK_EL) DPK_EL.style.display = 'none';
+      DPK = null;
+    }
+
+    function toggleDatepicker(inputId) {
+      if (DPK && DPK.inputId === inputId) { closeDatepicker(); return; }
+      openDatepicker(inputId);
+    }
+
+    function selectDpkDate(y, m, d) {
+      if (!DPK) return;
+      var id = DPK.inputId;
+      var date = new Date(y, m, d);
+      var v = toInputValue(date);
+      var input = el(id);
+      input.value = v;
+      if (DATE_COMMITS[id]) DATE_COMMITS[id](v);
+      toggleResetBtn(id, true);
+      closeDatepicker();
+    }
+
+    /* ================================================================
      * 띠 데이터 & 계산
      * ================================================================ */
     var STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-    var BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    var GANZHI_BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 
     var STYLE = {
       rose:    { idle: 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100',    active: 'bg-rose-500 border-rose-600 text-white shadow-lg shadow-rose-500/30' },
@@ -315,7 +523,7 @@
     ];
 
     function getZodiacByYear(year) { return ZODIACS[(((year - 4) % 12) + 12) % 12]; }
-    function getGanZhi(year) { return STEMS[(year - 4) % 10] + BRANCHES[(year - 4) % 12]; }
+    function getGanZhi(year) { return STEMS[(year - 4) % 10] + GANZHI_BRANCHES[(year - 4) % 12]; }
 
     function getManAge(birth, now) {
       var age = now.getFullYear() - birth.getFullYear();
@@ -388,16 +596,16 @@
     var state = {
       tab: 'solar',
       slMode: 'solar2lunar',
-      slDate: toInputValue(NOW),
+      slDate: '',
       slLeap: false,
       ddMode: 'add',
-      ddBase: toInputValue(NOW),
+      ddBase: '',
       ddDays: 100,
-      ddTarget: toInputValue(addDays(NOW, 100)),
+      ddTarget: '',
       ageBirth: '',
       zzKey: getZodiacByYear(CURRENT_YEAR).key,
       zzQuery: '',
-      milDate: toInputValue(NOW),
+      milDate: '',
       milBranch: 'army'
     };
 
@@ -672,10 +880,22 @@
     function updateZodiacResults() {
       updateZodiacButtons();
 
+      var q = state.zzQuery.trim();
+
+      // ★ 실시간 생년 검색: 4자리 년도 입력 즉시 해당 띠로 동기화
+      var yearQ = /^\d{4}$/.test(q) ? parseInt(q, 10) : -1;
+      var liveZodiac = null;
+      if (yearQ >= CURRENT_YEAR - 100 && yearQ <= CURRENT_YEAR) {
+        liveZodiac = getZodiacByYear(yearQ);
+        if (state.zzKey !== liveZodiac.key) {
+          state.zzKey = liveZodiac.key;
+          updateZodiacButtons();
+        }
+      }
+
       var zodiac = null;
       for (var i = 0; i < ZODIACS.length; i++) { if (ZODIACS[i].key === state.zzKey) { zodiac = ZODIACS[i]; break; } }
       var rows = buildZodiacRows(zodiac, CURRENT_YEAR);
-      var q = state.zzQuery.trim();
       var filtered;
       if (!q) {
         filtered = rows;
@@ -687,6 +907,35 @@
         }
       }
       var latest = rows.length > 0 ? rows[0] : null;
+
+      // ★ 실시간 결과 카드 (입력창 바로 아래)
+      var liveHtml = '';
+      if (liveZodiac) {
+        var gan = getGanZhi(yearQ);
+        var mAge = CURRENT_YEAR - yearQ;
+        var kAge = mAge + 1;
+        liveHtml =
+          '<div class="animate-fade-up mt-3 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">' +
+          '<div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border text-3xl ' + liveZodiac.idle + '">' + liveZodiac.emoji + '</div>' +
+          '<div class="min-w-0 flex-1">' +
+          '<div class="flex flex-wrap items-center gap-2">' +
+          '<span class="text-base font-extrabold text-slate-800">' + yearQ + '년생</span>' +
+          badge('amber', liveZodiac.name + '띠') +
+          badge('emerald', gan + '년') +
+          '</div>' +
+          '<div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-slate-500">' +
+          '<span>만 ' + mAge + '세</span>' +
+          '<span>연 ' + mAge + '세</span>' +
+          '<span class="text-slate-400">세는 나이 ' + kAge + '세</span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="shrink-0 text-right">' +
+          '<div class="text-[10px] font-bold text-slate-400">세차(간지)</div>' +
+          '<div class="mt-0.5 text-xl font-black text-amber-600">' + gan + '</div>' +
+          '</div>' +
+          '</div>';
+      }
+      el('zz-live').innerHTML = liveHtml;
 
       el('zz-summary').innerHTML =
         '<div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">' +
@@ -818,6 +1067,7 @@
 
     function switchTab(key) {
       state.tab = key;
+      closeDatepicker();
       var tabButtons = document.querySelectorAll('.tab-btn');
       for (var i = 0; i < tabButtons.length; i++) {
         var btn = tabButtons[i];
@@ -887,10 +1137,11 @@
           btn.addEventListener('click', function () { state.slMode = btn.dataset.value; updateSolarResults(); });
         })(slSeg[j]);
       }
-      el('sl-date').addEventListener('change', function (e) { state.slDate = e.target.value; updateSolarResults(); });
+      bindFlexDate('sl-date', function (v) { state.slDate = v; updateSolarResults(); });
       el('sl-today').addEventListener('click', function () {
         state.slDate = toInputValue(today());
         el('sl-date').value = state.slDate;
+        toggleResetBtn('sl-date', true);
         updateSolarResults();
       });
       el('sl-leap').addEventListener('change', function (e) { state.slLeap = e.target.checked; updateSolarResults(); });
@@ -902,7 +1153,7 @@
           btn.addEventListener('click', function () { state.ddMode = btn.dataset.value; updateDdayResults(); });
         })(ddSeg[k]);
       }
-      el('dd-base').addEventListener('change', function (e) { state.ddBase = e.target.value; updateDdayResults(); });
+      bindFlexDate('dd-base', function (v) { state.ddBase = v; updateDdayResults(); });
       el('dd-days').addEventListener('input', function (e) { state.ddDays = Number(e.target.value) || 0; updateDdayResults(); });
       var chips = document.querySelectorAll('[data-days]');
       for (var c = 0; c < chips.length; c++) {
@@ -914,16 +1165,22 @@
           });
         })(chips[c]);
       }
-      el('dd-target').addEventListener('change', function (e) { state.ddTarget = e.target.value; updateDdayResults(); });
+      bindFlexDate('dd-target', function (v) { state.ddTarget = v; updateDdayResults(); });
 
       // 탭 3: 만 나이/띠
-      el('age-birth').addEventListener('change', function (e) { state.ageBirth = e.target.value; updateAgeResults(); });
+      bindFlexDate('age-birth', function (v) { state.ageBirth = v; updateAgeResults(); });
 
       // 탭 4: 띠 대조표
       var zzBtns = document.querySelectorAll('[data-zkey]');
       for (var zz = 0; zz < zzBtns.length; zz++) {
         (function (btn) {
-          btn.addEventListener('click', function () { state.zzKey = btn.dataset.zkey; updateZodiacResults(); });
+          btn.addEventListener('click', function () {
+            // 동물 아이콘 클릭 → 해당 띠 전체 목록 표시 (검색어 초기화로 충돌 방지)
+            state.zzKey = btn.dataset.zkey;
+            state.zzQuery = '';
+            el('zz-query').value = '';
+            updateZodiacResults();
+          });
         })(zzBtns[zz]);
       }
       el('zz-query').addEventListener('input', function (e) { state.zzQuery = e.target.value; updateZodiacResults(); });
@@ -935,23 +1192,53 @@
           btn.addEventListener('click', function () { state.milBranch = btn.dataset.bkey; updateMilitaryResults(); });
         })(milBtns[mb]);
       }
-      el('mil-date').addEventListener('change', function (e) { state.milDate = e.target.value; updateMilitaryResults(); });
+      bindFlexDate('mil-date', function (v) { state.milDate = v; updateMilitaryResults(); });
+
+      // 달력 아이콘 → 팝업 열기/닫기
+      var trigs = document.querySelectorAll('[data-date-trigger]');
+      for (var tg = 0; tg < trigs.length; tg++) {
+        (function (btn) {
+          btn.addEventListener('click', function (e) { e.preventDefault(); toggleDatepicker(btn.dataset.dateTrigger); });
+        })(trigs[tg]);
+      }
+
+      // 초기화(X) 버튼 → 입력값 즉시 지우기
+      var resetBtns = document.querySelectorAll('[data-reset-for]');
+      for (var rb = 0; rb < resetBtns.length; rb++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.dataset.resetFor;
+            var input = el(id);
+            input.value = '';
+            if (DATE_COMMITS[id]) DATE_COMMITS[id]('');
+            toggleResetBtn(id, false);
+            input.focus();
+          });
+        })(resetBtns[rb]);
+      }
     }
+
+    // 달력 팝업 바깥 클릭 / ESC 닫기
+    document.addEventListener('click', function (e) {
+      if (!DPK) return;
+      if (DPK_EL.contains(e.target)) return;
+      var trig = e.target.closest('[data-date-trigger]');
+      if (trig && trig.dataset.dateTrigger === DPK.inputId) return;
+      closeDatepicker();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDatepicker();
+    });
 
     function init() {
       // 헤더 오늘 정보
       var yz = getZodiacByYear(CURRENT_YEAR);
       el('today-chip').textContent = '오늘 ' + fmtLong(NOW) + ' · ' + yz.emoji + ' ' + yz.name + '띠해 (' + getGanZhi(CURRENT_YEAR) + '년)';
 
-      // 초기 입력값
-      el('sl-date').value = state.slDate;
-      el('dd-base').value = state.ddBase;
+      // 초기 입력값 (날짜 입력창은 빈 값 + 플레이스홀더 상태)
       el('dd-days').value = state.ddDays;
-      el('dd-target').value = state.ddTarget;
-      el('age-birth').max = toInputValue(NOW);
-      el('mil-date').value = state.milDate;
       el('zz-query').placeholder = CURRENT_YEAR + '년 기준 년생·나이 검색 (예: 1996)';
-      el('zz-note').textContent = CURRENT_YEAR + '년(올해)을 기준으로 만 0세 ~ 100세의 출생 연도를 계산합니다. 띠는 태어난 해(양력) 기준입니다.';
+      el('zz-note').textContent = CURRENT_YEAR + '년(올해)을 기준으로 만 0세 ~ 100세의 출생 연도를 계산합니다. 띠는 태어난 해(양력) 기준입니다. 4자리 생년(예: 1988)을 입력하면 바로 아래 카드에서 띠·나이·세차를 확인할 수 있어요.';
 
       buildZodiacGrid();
       buildBranchGrid();

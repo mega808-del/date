@@ -291,12 +291,9 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 </div>
 <h2 class="text-lg font-extrabold text-slate-900">앱 설치 방법</h2>
 <p id="install-modal-desc" class="mt-2 text-sm leading-relaxed text-slate-600">브라우저 메뉴(⋮ 또는 공유 버튼)에서 '홈 화면에 추가'를 누르면 스마트폰 앱으로 설치할 수 있습니다.</p>
-<div id="install-modal-ext" class="mt-4 hidden flex-col gap-2">
-<button type="button" id="install-open-chrome" class="flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-base font-bold text-blue-700 transition-all duration-200 hover:bg-blue-100 active:scale-95">
-<i data-lucide="chrome" class="w-4 h-4"></i>Chrome에서 열기
-</button>
-<button type="button" id="install-open-samsung" class="flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-base font-bold text-sky-700 transition-all duration-200 hover:bg-sky-100 active:scale-95">
-<i data-lucide="globe" class="w-4 h-4"></i>삼성 인터넷에서 열기
+<div id="install-modal-ext" class="mt-4 hidden flex-col">
+<button type="button" id="install-open-browser" class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00b074] px-4 py-3.5 text-base font-bold text-white shadow-md shadow-emerald-600/30 transition-all duration-200 hover:bg-[#009a63] active:scale-95">
+<i data-lucide="external-link" class="w-4 h-4"></i>삼성 인터넷 / Chrome에서 열어 설치하기
 </button>
 </div>
 <button type="button" id="install-modal-close" class="mt-5 w-full rounded-xl bg-[#00b074] py-3 text-base font-bold text-white transition-all duration-200 hover:bg-[#009a63] active:scale-95">확인</button>
@@ -1248,7 +1245,7 @@ function showInstallModal() {
   var descEl = document.getElementById('install-modal-desc');
   if (isAndroid && isInAppBrowser) {
     // 카카오톡 등 인앱 브라우저: 외부 브라우저에서 열도록 안내
-    descEl.textContent = '카카오톡 등 앱 내부 브라우저에서는 앱 설치가 제한됩니다. 아래 버튼으로 Chrome 또는 삼성 인터넷에서 열어주세요.';
+    descEl.textContent = '카카오톡 등 앱 내부 브라우저에서는 앱 설치가 제한됩니다. 아래 버튼을 눌러 실제 브라우저에서 열어 설치해 주세요.';
     extWrap.classList.remove('hidden');
     extWrap.classList.add('flex');
   } else {
@@ -1268,18 +1265,28 @@ installModal.addEventListener('click', function (e) { if (e.target === installMo
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') { hideInstallModal(); closeShareModal(); }
 });
-/* 인앱 브라우저 → 외부 브라우저에서 열기 (intent://) */
-function openExternalBrowser(pkg) {
-  var host = SHARE_URL.replace(/^https?:\/\//, '');
-  var intentUrl = 'intent://' + host + '#Intent;scheme=https;package=' + pkg + ';S.browser_fallback_url=' + encodeURIComponent(SHARE_URL) + ';end';
+/* 인앱 브라우저 → 실제 브라우저에서 열기: 삼성 인터넷 우선, Chrome 폴백 (intent://) */
+function openExternalBrowser() {
+  hideInstallModal();
+  var started = Date.now();
+  var samsungIntent = 'intent://mega808-del.github.io/date/#Intent;scheme=https;package=com.sec.android.app.sbrowser;end';
+  var chromeIntent = 'intent://mega808-del.github.io/date/#Intent;scheme=https;package=com.android.chrome;end;';
   try {
-    window.location.href = intentUrl;
+    window.location.href = samsungIntent;
   } catch (err) {
-    window.open(SHARE_URL, '_blank');
+    try { window.location.href = chromeIntent; } catch (err2) { window.location.href = SHARE_URL; }
+    return;
   }
+  // 1.5초 내에 삼성 인터넷이 열리지 않으면 Chrome intent로 폴백
+  var check = setInterval(function () {
+    if (document.visibilityState === 'hidden') { clearInterval(check); return; } // 삼성 인터넷이 열림
+    if (Date.now() - started > 1500) {
+      clearInterval(check);
+      try { window.location.href = chromeIntent; } catch (err3) { window.location.href = SHARE_URL; }
+    }
+  }, 200);
 }
-document.getElementById('install-open-chrome').addEventListener('click', function () { openExternalBrowser('com.android.chrome'); });
-document.getElementById('install-open-samsung').addEventListener('click', function () { openExternalBrowser('com.sec.android.app.sbrowser'); });
+document.getElementById('install-open-browser').addEventListener('click', openExternalBrowser);
 /* ================================================================
 * PWA: 공유 버튼 (Web Share API + 클립보드 폴백)
 * ================================================================ */
@@ -1336,34 +1343,15 @@ function closeShareModal() {
   shareModal.classList.add('hidden');
   shareModal.classList.remove('flex');
 }
-/* 공유 버튼: 1) 네이티브 Web Share API 먼저 시도 (Android Chrome, 삼성 인터넷) */
-/*          2) 미지원/차단(카카오톡 인앱 등) 시 커스텀 공유 시트로 폴백 */
-function handleShareClick() {
-  try {
-    if (navigator.share) {
-      navigator.share({
-        title: '올인원 날짜 & 띠 계산기',
-        text: '올인원 날짜 & 띠 계산기',
-        url: SHARE_URL
-      }).catch(function (err) {
-        // 사용자가 공유창을 닫은 경우(AbortError)는 조용히 무시, 그 외 실패/차단 시 커스텀 시트
-        if (err && err.name !== 'AbortError') openShareModal();
-      });
-    } else {
-      openShareModal();
-    }
-  } catch (err) {
-    openShareModal();
-  }
-}
-document.getElementById('share-app-btn').addEventListener('click', handleShareClick);
+/* 공유 버튼: 항상 커스텀 공유 시트 모달 표시 (카카오톡 / 문자 / 링크 복사) */
+document.getElementById('share-app-btn').addEventListener('click', openShareModal);
 document.getElementById('share-modal-close').addEventListener('click', closeShareModal);
 shareModal.addEventListener('click', function (e) { if (e.target === shareModal) closeShareModal(); });
 /* 1) 카카오톡으로 공유 — 딥링크 시도, 열리지 않으면 링크 복사 폴백 */
 function shareKakao() {
   closeShareModal();
   var started = Date.now();
-  var deepLink = 'kakaolink://send?url=' + encodeURIComponent(SHARE_URL) + '&text=' + encodeURIComponent('올인원 날짜&띠 계산기');
+  var deepLink = 'kakaolink://send?url=' + encodeURIComponent(SHARE_URL) + '&text=' + encodeURIComponent('올인원 날짜 & 띠 계산기');
   try {
     window.location.href = deepLink;
   } catch (err) {
@@ -1382,7 +1370,7 @@ document.getElementById('share-kakao').addEventListener('click', shareKakao);
 /* 2) 문자로 공유 — 네이티브 SMS 앱 실행 */
 function shareSms() {
   closeShareModal();
-  var body = encodeURIComponent('올인원 날짜&띠 계산기: ' + SHARE_URL);
+  var body = encodeURIComponent('올인원 날짜 & 띠 계산기: ' + SHARE_URL);
   try {
     window.location.href = 'sms:?body=' + body;
   } catch (err) {

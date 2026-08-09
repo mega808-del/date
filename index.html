@@ -1270,7 +1270,7 @@ function openExternalBrowser() {
   hideInstallModal();
   var started = Date.now();
   var samsungIntent = 'intent://mega808-del.github.io/date/#Intent;scheme=https;package=com.sec.android.app.sbrowser;end';
-  var chromeIntent = 'intent://mega808-del.github.io/date/#Intent;scheme=https;package=com.android.chrome;end;';
+  var chromeIntent = 'intent://mega808-del.github.io/date/#Intent;scheme=https;package=com.android.chrome;end';
   try {
     window.location.href = samsungIntent;
   } catch (err) {
@@ -1343,15 +1343,39 @@ function closeShareModal() {
   shareModal.classList.add('hidden');
   shareModal.classList.remove('flex');
 }
-/* 공유 버튼: 항상 커스텀 공유 시트 모달 표시 (카카오톡 / 문자 / 링크 복사) */
-document.getElementById('share-app-btn').addEventListener('click', openShareModal);
+/* 공유 버튼: Android 모바일에서는 항상 커스텀 공유 시트 표시 (카카오톡/문자/링크 복사) */
+/* 그 외(데스크톱/iOS)에서는 네이티브 Web Share API 우선 + 클립보드 폴백 */
+function handleShareClick() {
+  if (isAndroid) {
+    openShareModal();
+    return;
+  }
+  try {
+    if (navigator.share) {
+      navigator.share({
+        title: '올인원 날짜 & 띠 계산기',
+        text: '올인원 날짜 & 띠 계산기',
+        url: SHARE_URL
+      }).catch(function (err) {
+        // 사용자가 공유창을 닫은 경우(AbortError)는 무시, 그 외 실패는 링크 복사로 폴백
+        if (err && err.name !== 'AbortError') copyLink(SHARE_URL);
+      });
+    } else {
+      copyLink(SHARE_URL);
+    }
+  } catch (err) {
+    copyLink(SHARE_URL);
+  }
+}
+document.getElementById('share-app-btn').addEventListener('click', handleShareClick);
 document.getElementById('share-modal-close').addEventListener('click', closeShareModal);
 shareModal.addEventListener('click', function (e) { if (e.target === shareModal) closeShareModal(); });
-/* 1) 카카오톡으로 공유 — 딥링크 시도, 열리지 않으면 링크 복사 폴백 */
+/* 1) 카카오톡으로 공유 — 카카오톡 앱(딥링크) 우선 실행, 실패 시 웹 공유 페이지 + 링크 복사 폴백 */
 function shareKakao() {
   closeShareModal();
   var started = Date.now();
   var deepLink = 'kakaolink://send?url=' + encodeURIComponent(SHARE_URL) + '&text=' + encodeURIComponent('올인원 날짜 & 띠 계산기');
+  var webShareUrl = 'https://share.kakao.com/'; // 범용 카카오 웹 공유 페이지 (SDK 앱키 불필요)
   try {
     window.location.href = deepLink;
   } catch (err) {
@@ -1359,10 +1383,12 @@ function shareKakao() {
     return;
   }
   var check = setInterval(function () {
-    if (document.visibilityState === 'hidden') { clearInterval(check); return; } // 카카오톡이 열림
+    if (document.visibilityState === 'hidden') { clearInterval(check); return; } // 카카오톡 앱이 열림
     if (Date.now() - started > 1500) {
       clearInterval(check);
-      copyLink(SHARE_URL, '카카오톡이 열리지 않아 링크를 복사했어요. 카카오톡에 붙여넣어 주세요.');
+      // 카카오톡 앱 미설치/차단 시 웹 공유 페이지 시도 (팝업 차단 시 조용히 무시)
+      try { window.open(webShareUrl, '_blank'); } catch (err2) {}
+      copyLink(SHARE_URL, '카카오톡 앱이 열리지 않아 링크를 복사했어요. 카카오톡에 붙여넣어 주세요.');
     }
   }, 200);
 }
@@ -1371,11 +1397,21 @@ document.getElementById('share-kakao').addEventListener('click', shareKakao);
 function shareSms() {
   closeShareModal();
   var body = encodeURIComponent('올인원 날짜 & 띠 계산기: ' + SHARE_URL);
+  var started = Date.now();
   try {
     window.location.href = 'sms:?body=' + body;
   } catch (err) {
-    copyLink(SHARE_URL);
+    try { window.location.href = 'sms:;?&body=' + body; } catch (err2) { copyLink(SHARE_URL); }
+    return;
   }
+  // 1.2초 내에 SMS 앱이 열리지 않으면 일부 기기 호환 형식(sms:;?&body=)으로 재시도
+  var check = setInterval(function () {
+    if (document.visibilityState === 'hidden') { clearInterval(check); return; } // SMS 앱이 열림
+    if (Date.now() - started > 1200) {
+      clearInterval(check);
+      try { window.location.href = 'sms:;?&body=' + body; } catch (err3) { copyLink(SHARE_URL); }
+    }
+  }, 200);
 }
 document.getElementById('share-sms').addEventListener('click', shareSms);
 /* 3) 링크 복사 */

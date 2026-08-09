@@ -7,6 +7,13 @@
 <meta name="theme-color" content="#10b981" />
 <meta name="description" content="올인원 날짜 &amp; 띠 계산기 — 양·음력 변환, D-Day, 만 나이, 띠 대조표, 전역일" />
 <title>올인원 날짜 & 띠 계산기</title>
+<!-- PWA: 인라인 Web App Manifest (Data URI) & iOS 홈화면 -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"%EC%98%AC%EC%9D%B8%EC%9B%90%20%EB%82%A0%EC%A7%9C%20%EA%B3%84%EC%82%B0%EA%B8%B0","short_name":"%EB%82%A0%EC%A7%9C%EA%B3%84%EC%82%B0%EA%B8%B0","display":"standalone","start_url":"./","scope":"./","orientation":"portrait","theme_color":"%2300b074","background_color":"%23ffffff","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}]}' />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="날짜계산기" />
+<link rel="apple-touch-icon" href="icon.svg" />
 <!-- Tailwind CSS (CDN) -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -46,7 +53,16 @@ to { opacity: 1; transform: translateY(0); }
 <div class="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-emerald-50/50">
 <div class="mx-auto max-w-[640px] px-4 pb-20">
 <!-- ===== 헤더 ===== -->
-<header class="pt-8 pb-5 text-center">
+<header class="relative pt-8 pb-5 text-center">
+<!-- ===== 우측 상단: 앱 설치 / 공유 버튼 ===== -->
+<div class="absolute right-4 top-3 z-10 flex items-center gap-2">
+<button type="button" id="install-app-btn" aria-label="앱 설치" title="앱 설치" class="flex items-center gap-1.5 rounded-full bg-[#00b074] px-3.5 py-2 text-sm font-bold text-white shadow-md shadow-emerald-600/30 transition-all duration-200 hover:bg-[#009a63] hover:shadow-lg active:scale-95">
+<i data-lucide="download" class="w-4 h-4"></i><span class="hidden min-[480px]:inline">앱 설치</span>
+</button>
+<button type="button" id="share-app-btn" aria-label="앱 공유하기" title="앱 공유하기" class="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/95 px-3.5 py-2 text-sm font-bold text-[#00b074] shadow-sm transition-all duration-200 hover:border-[#00b074] hover:bg-emerald-50 active:scale-95">
+<i data-lucide="share-2" class="w-4 h-4"></i><span class="hidden min-[480px]:inline">공유</span>
+</button>
+</div>
 <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-500/40">
 <i data-lucide="calendar-heart" class="w-7 h-7"></i>
 </div>
@@ -265,6 +281,17 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 <p class="mt-0.5">Made with 💚 for a smarter day</p>
 <p class="mt-2 text-[#666666]">Created by Seong Hyo</p>
 </footer>
+</div>
+</div>
+<!-- ===== PWA: 설치 안내 모달 (iOS / 인앱 브라우저) ===== -->
+<div id="install-modal" role="dialog" aria-modal="true" aria-label="앱 설치 방법" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+<div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-2xl">
+<div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+<i data-lucide="smartphone" class="w-7 h-7"></i>
+</div>
+<h2 class="text-lg font-extrabold text-slate-900">앱 설치 방법</h2>
+<p class="mt-2 text-sm leading-relaxed text-slate-600">브라우저 메뉴(⋮ 또는 공유 버튼)에서 '홈 화면에 추가'를 누르면 스마트폰 앱으로 설치할 수 있습니다.</p>
+<button type="button" id="install-modal-close" class="mt-5 w-full rounded-xl bg-[#00b074] py-3 text-base font-bold text-white transition-all duration-200 hover:bg-[#009a63] active:scale-95">확인</button>
 </div>
 </div>
 <script>
@@ -1126,6 +1153,135 @@ if (DPK && !DPK_EL.contains(e.target) && !e.target.closest('[data-date-trigger]'
 });
 }
 document.addEventListener('DOMContentLoaded', init);
+</script>
+<script>
+'use strict';
+/* ================================================================
+* PWA: 앱 설치 버튼 (beforeinstallprompt)
+* - 설치 프롬프트가 준비되면(HTTPS/Android Chrome) 공식 설치
+*   대화상자를 띄우고, 준비되지 않은 브라우저(iOS Safari,
+*   KakaoTalk 등 인앱 브라우저)에서는 '홈 화면에 추가' 안내 모달 표시
+* ================================================================ */
+var deferredPrompt = null;
+var installBtn = document.getElementById('install-app-btn');
+var installModal = document.getElementById('install-modal');
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+installBtn.addEventListener('click', function () {
+  if (deferredPrompt) {
+    try {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function (choice) {
+        deferredPrompt = null;
+        if (choice && choice.outcome === 'accepted') installBtn.classList.add('hidden');
+      }).catch(function () { deferredPrompt = null; });
+    } catch (err) {
+      // prompt()가 이미 사용된 경우 등 예외 상황에도 오류 없이 안내 모달로 폴백
+      deferredPrompt = null;
+      showInstallModal();
+    }
+  } else {
+    showInstallModal();
+  }
+});
+window.addEventListener('appinstalled', function () {
+  deferredPrompt = null;
+  installBtn.classList.add('hidden');
+});
+function showInstallModal() {
+  installModal.classList.remove('hidden');
+  installModal.classList.add('flex');
+}
+function hideInstallModal() {
+  installModal.classList.add('hidden');
+  installModal.classList.remove('flex');
+}
+document.getElementById('install-modal-close').addEventListener('click', hideInstallModal);
+installModal.addEventListener('click', function (e) { if (e.target === installModal) hideInstallModal(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideInstallModal(); });
+/* ================================================================
+* PWA: 공유 버튼 (Web Share API + 클립보드 폴백)
+* ================================================================ */
+function showToast(msg) {
+  var old = document.getElementById('app-toast');
+  if (old) old.remove();
+  var wrap = document.createElement('div');
+  wrap.id = 'app-toast';
+  wrap.className = 'fixed bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none';
+  var inner = document.createElement('div');
+  inner.className = 'animate-fade-up rounded-full bg-slate-900/90 px-5 py-2.5 text-sm font-bold text-white shadow-xl';
+  inner.textContent = msg;
+  wrap.appendChild(inner);
+  document.body.appendChild(wrap);
+  setTimeout(function () {
+    inner.style.transition = 'opacity 0.3s ease';
+    inner.style.opacity = '0';
+    setTimeout(function () { wrap.remove(); }, 320);
+  }, 2200);
+}
+function legacyCopy(url) {
+  var ta = document.createElement('textarea');
+  ta.value = url;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.top = '0';
+  ta.style.left = '0';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+  document.body.removeChild(ta);
+  showToast(ok ? '공유 링크가 복사되었습니다!' : '공유를 지원하지 않는 브라우저입니다.');
+}
+function copyLink(url) {
+  if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(function () {
+      showToast('공유 링크가 복사되었습니다!');
+    }, function () { legacyCopy(url); });
+  } else {
+    legacyCopy(url);
+  }
+}
+/* 공유 대상: 배포된 라이브 URL (https://mega808-del.github.io/date/) */
+var SHARE_URL = 'https://mega808-del.github.io/date/';
+function handleShare() {
+  var shareData = {
+    title: '올인원 날짜 계산기',
+    text: '양음력 변환, D-Day, 만 나이, 전역일 계산을 한 번에! 날짜 계산기 어플을 이용해보세요.',
+    url: SHARE_URL
+  };
+  try {
+    if (navigator.share) {
+      navigator.share(shareData).catch(function (err) {
+        // 사용자가 공유창을 닫은 경우(AbortError)는 무시, 그 외 실패는 클립보드로 폴백
+        if (err && err.name !== 'AbortError') copyLink(SHARE_URL);
+      });
+    } else {
+      copyLink(SHARE_URL);
+    }
+  } catch (err) {
+    copyLink(SHARE_URL);
+  }
+}
+document.getElementById('share-app-btn').addEventListener('click', handleShare);
+/* ================================================================
+* PWA: 서비스 워커 등록 (HTTPS 또는 localhost에서만 동작,
+* file:// 더블클릭 시에는 등록을 건너뛰어 경고를 남기지 않음)
+* ================================================================ */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (err) {
+      console.warn('[PWA] 서비스 워커 등록 실패:', err);
+    });
+  });
+}
+/* 신규 버튼/모달의 Lucide 아이콘 렌더링 (기존 앱 코드에 영향 없음) */
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.lucide) lucide.createIcons();
+});
 </script>
 </body>
 </html>

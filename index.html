@@ -7,8 +7,8 @@
 <meta name="theme-color" content="#10b981" />
 <meta name="description" content="올인원 날짜 &amp; 띠 계산기 — 양·음력 변환, D-Day, 만 나이, 띠 대조표, 전역일" />
 <title>올인원 날짜 & 띠 계산기</title>
-<!-- PWA: 인라인 Web App Manifest (Data URI) & iOS 홈화면 -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"%EC%98%AC%EC%9D%B8%EC%9B%90%20%EB%82%A0%EC%A7%9C%20%EA%B3%84%EC%82%B0%EA%B8%B0","short_name":"%EB%82%A0%EC%A7%9C%EA%B3%84%EC%82%B0%EA%B8%B0","display":"standalone","start_url":"./index.html","scope":"./","orientation":"portrait","theme_color":"%2300b074","background_color":"%23ffffff","icons":[{"src":"data:image/svg+xml,%253Csvg%2520xmlns=%2522http://www.w3.org/2000/svg%2522%2520width=%2522512%2522%2520height=%2522512%2522%2520viewBox=%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id=%2522bg%2522%2520x1=%25220%2522%2520y1=%25220%2522%2520x2=%25220%2522%2520y2=%25221%2522%253E%253Cstop%2520offset=%25220%2522%2520stop-color=%2522%252300c889%2522/%253E%253Cstop%2520offset=%25221%2522%2520stop-color=%2522%252300b074%2522/%253E%253C/linearGradient%253E%253C/defs%253E%253Crect%2520width=%2522512%2522%2520height=%2522512%2522%2520fill=%2522url(%2523bg)%2522/%253E%253Crect%2520x=%2522128%2522%2520y=%2522112%2522%2520width=%2522256%2522%2520height=%2522288%2522%2520rx=%252224%2522%2520fill=%2522%2523ffffff%2522/%253E%253Ccircle%2520cx=%2522196%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Ccircle%2520cx=%2522316%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Cg%2520fill=%2522%2523b8e6cf%2522%253E%253Crect%2520x=%2522136%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522%2520fill=%2522%252300b074%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253C/g%253E%253C/svg%253E","sizes":"192x192","type":"image/svg+xml","purpose":"any"},{"src":"data:image/svg+xml,%253Csvg%2520xmlns=%2522http://www.w3.org/2000/svg%2522%2520width=%2522512%2522%2520height=%2522512%2522%2520viewBox=%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id=%2522bg%2522%2520x1=%25220%2522%2520y1=%25220%2522%2520x2=%25220%2522%2520y2=%25221%2522%253E%253Cstop%2520offset=%25220%2522%2520stop-color=%2522%252300c889%2522/%253E%253Cstop%2520offset=%25221%2522%2520stop-color=%2522%252300b074%2522/%253E%253C/linearGradient%253E%253C/defs%253E%253Crect%2520width=%2522512%2522%2520height=%2522512%2522%2520fill=%2522url(%2523bg)%2522/%253E%253Crect%2520x=%2522128%2522%2520y=%2522112%2522%2520width=%2522256%2522%2520height=%2522288%2522%2520rx=%252224%2522%2520fill=%2522%2523ffffff%2522/%253E%253Ccircle%2520cx=%2522196%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Ccircle%2520cx=%2522316%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Cg%2520fill=%2522%2523b8e6cf%2522%253E%253Crect%2520x=%2522136%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522%2520fill=%2522%252300b074%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253C/g%253E%253C/svg%253E","sizes":"512x512","type":"image/svg+xml","purpose":"any"},{"src":"data:image/svg+xml,%253Csvg%2520xmlns=%2522http://www.w3.org/2000/svg%2522%2520width=%2522512%2522%2520height=%2522512%2522%2520viewBox=%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id=%2522bg%2522%2520x1=%25220%2522%2520y1=%25220%2522%2520x2=%25220%2522%2520y2=%25221%2522%253E%253Cstop%2520offset=%25220%2522%2520stop-color=%2522%252300c889%2522/%253E%253Cstop%2520offset=%25221%2522%2520stop-color=%2522%252300b074%2522/%253E%253C/linearGradient%253E%253C/defs%253E%253Crect%2520width=%2522512%2522%2520height=%2522512%2522%2520fill=%2522url(%2523bg)%2522/%253E%253Crect%2520x=%2522128%2522%2520y=%2522112%2522%2520width=%2522256%2522%2520height=%2522288%2522%2520rx=%252224%2522%2520fill=%2522%2523ffffff%2522/%253E%253Ccircle%2520cx=%2522196%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Ccircle%2520cx=%2522316%2522%2520cy=%2522112%2522%2520r=%252216%2522%2520fill=%2522%2523008f5e%2522/%253E%253Cg%2520fill=%2522%2523b8e6cf%2522%253E%253Crect%2520x=%2522136%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522184%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522%2520fill=%2522%252300b074%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522248%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522136%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522200%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522264%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253Crect%2520x=%2522328%2522%2520y=%2522312%2522%2520width=%252248%2522%2520height=%252248%2522%2520rx=%252210%2522/%253E%253C/g%253E%253C/svg%253E","sizes":"512x512","type":"image/svg+xml","purpose":"maskable"}]}' />
+<!-- PWA: Web App Manifest (외부 manifest.json — Android Chrome/삼성 인터넷 설치 인식 필수) & iOS 홈화면 -->
+<link rel="manifest" href="manifest.json" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -338,6 +338,23 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 <i data-lucide="chevron-right" class="w-4 h-4 shrink-0 text-slate-400"></i>
 </button>
 </div>
+</div>
+</div>
+<!-- ===== 공유: 외부 브라우저 안내 모달 (카카오톡 등 인앱 브라우저에서 navigator.share 미지원 시) ===== -->
+<div id="share-guide-modal" role="dialog" aria-modal="true" aria-label="공유 안내" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+<div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-2xl">
+<div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+<i data-lucide="share-2" class="w-7 h-7"></i>
+</div>
+<h2 class="text-lg font-extrabold text-slate-900">공유 안내</h2>
+<p class="mt-2 text-sm leading-relaxed text-slate-600">카카오톡 등 앱 내부 브라우저에서는 시스템 공유 창이 제한됩니다. 아래 버튼을 눌러 Chrome/삼성 인터넷에서 열면, 공유 버튼으로 카카오톡·문자·Gmail 등으로 공유할 수 있습니다.</p>
+<div class="mt-4 flex flex-col gap-2">
+<button type="button" id="share-open-browser" class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00b074] px-4 py-3.5 text-base font-bold text-white shadow-md shadow-emerald-600/30 transition-all duration-200 hover:bg-[#009a63] active:scale-95">
+<i data-lucide="external-link" class="w-4 h-4"></i>Chrome / 삼성 인터넷에서 열기
+</button>
+<button type="button" id="share-guide-copy" class="w-full rounded-xl border border-emerald-200 bg-white px-4 py-3 text-base font-bold text-[#00b074] transition-all duration-200 hover:bg-emerald-50 active:scale-95">링크 복사</button>
+</div>
+<button type="button" id="share-guide-close" class="mt-4 w-full rounded-xl bg-slate-100 py-3 text-base font-bold text-slate-700 transition-all duration-200 hover:bg-slate-200 active:scale-95">닫기</button>
 </div>
 </div>
 <script>
@@ -1236,6 +1253,10 @@ window.addEventListener('appinstalled', function () {
   deferredPrompt = null;
   installBtn.classList.add('hidden');
 });
+/* 이미 설치된 상태(홈 화면에서 standalone 실행)에서는 중복 설치가 발생하지 않도록 설치 버튼 숨김 */
+if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+  installBtn.classList.add('hidden');
+}
 /* 브라우저 감지: Android / 카카오톡 등 인앱 브라우저 */
 var UA = navigator.userAgent;
 var isAndroid = /Android/i.test(UA);
@@ -1263,7 +1284,7 @@ function hideInstallModal() {
 document.getElementById('install-modal-close').addEventListener('click', hideInstallModal);
 installModal.addEventListener('click', function (e) { if (e.target === installModal) hideInstallModal(); });
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { hideInstallModal(); closeShareModal(); }
+  if (e.key === 'Escape') { hideInstallModal(); closeShareModal(); closeShareGuideModal(); }
 });
 /* 인앱 브라우저 → 실제 브라우저에서 열기: 삼성 인터넷 우선, Chrome 폴백 (intent://) */
 function openExternalBrowser() {
@@ -1343,27 +1364,38 @@ function closeShareModal() {
   shareModal.classList.add('hidden');
   shareModal.classList.remove('flex');
 }
-/* 공유 버튼: Android 모바일에서는 항상 커스텀 공유 시트 표시 (카카오톡/문자/링크 복사) */
-/* 그 외(데스크톱/iOS)에서는 네이티브 Web Share API 우선 + 클립보드 폴백 */
+/* 공유 버튼: Web Share API(navigator.share) 지원 환경(Android Chrome·삼성 인터넷·일반 외부 브라우저 포함)에서는
+   Android 네이티브 공유 시트(카카오톡/문자/Gmail/SNS)를 우선 호출하고,
+   미지원 환경에서만 기존 폴백을 유지합니다.
+   - 카카오톡 등 인앱 브라우저: 즉시 링크 복사하지 않고 외부 브라우저 안내 모달 표시
+   - 그 외 Android: 기존 커스텀 공유 시트(카카오톡/문자/링크 복사)
+   - 데스크톱: 기존 링크 복사 */
 function handleShareClick() {
-  if (isAndroid) {
-    openShareModal();
-    return;
-  }
-  try {
-    if (navigator.share) {
+  if (navigator.share) {
+    try {
       navigator.share({
         title: '올인원 날짜 & 띠 계산기',
-        text: '올인원 날짜 & 띠 계산기',
+        text: '올인원 날짜 & 띠 계산기를 확인해 보세요.',
         url: SHARE_URL
       }).catch(function (err) {
-        // 사용자가 공유창을 닫은 경우(AbortError)는 무시, 그 외 실패는 링크 복사로 폴백
-        if (err && err.name !== 'AbortError') copyLink(SHARE_URL);
+        // 사용자가 공유창을 취소(AbortError)한 경우에는 오류/링크 복사 메시지를 표시하지 않음
+        // 인앱 브라우저에서 share가 거부된 경우에는 복사 대신 외부 브라우저 안내 모달 표시
+        if (err && err.name !== 'AbortError') {
+          if (isInAppBrowser) openShareGuideModal(); else copyLink(SHARE_URL);
+        }
       });
-    } else {
-      copyLink(SHARE_URL);
+    } catch (err) {
+      // 극히 드문 동기 예외: 기존 폴백 동작 유지
+      if (isInAppBrowser) openShareGuideModal(); else if (isAndroid) openShareModal(); else copyLink(SHARE_URL);
     }
-  } catch (err) {
+  } else if (isInAppBrowser) {
+    // 카카오톡 등 인앱 브라우저: navigator.share 미지원 → 즉시 복사하지 않고 외부 브라우저 안내
+    openShareGuideModal();
+  } else if (isAndroid) {
+    // Web Share API 미지원 Android: 기존 커스텀 공유 시트(카카오톡/문자/링크 복사) 유지
+    openShareModal();
+  } else {
+    // Web Share API 미지원 데스크톱: 기존 링크 복사 유지
     copyLink(SHARE_URL);
   }
 }
@@ -1419,6 +1451,33 @@ document.getElementById('share-copy').addEventListener('click', function () {
   closeShareModal();
   copyLink(SHARE_URL);
 });
+/* ================================================================
+ * 공유: 외부 브라우저 안내 모달 (카카오톡 등 인앱 브라우저 — navigator.share 미지원)
+ * - navigator.share가 없는 인앱 브라우저에서는 링크를 즉시 복사하지 않고,
+ *   Chrome/삼성 인터넷에서 열어 네이티브 공유(카카오톡/문자/Gmail/SNS)를
+ *   사용할 수 있도록 안내합니다 (기존 openExternalBrowser() intent:// 로직 재사용)
+ * ================================================================ */
+var shareGuideModal = document.getElementById('share-guide-modal');
+function openShareGuideModal() {
+  shareGuideModal.classList.remove('hidden');
+  shareGuideModal.classList.add('flex');
+}
+function closeShareGuideModal() {
+  shareGuideModal.classList.add('hidden');
+  shareGuideModal.classList.remove('flex');
+}
+/* 외부 브라우저 열기: 삼성 인터넷 우선 → Chrome 폴백 (기존 설치 안내와 동일한 intent:// 방식) */
+document.getElementById('share-open-browser').addEventListener('click', function () {
+  closeShareGuideModal();
+  openExternalBrowser();
+});
+/* 링크 복사 — 사용자가 직접 선택한 경우에만 실행되는 최종 폴백 */
+document.getElementById('share-guide-copy').addEventListener('click', function () {
+  closeShareGuideModal();
+  copyLink(SHARE_URL);
+});
+document.getElementById('share-guide-close').addEventListener('click', closeShareGuideModal);
+shareGuideModal.addEventListener('click', function (e) { if (e.target === shareGuideModal) closeShareGuideModal(); });
 /* ================================================================
 * PWA: 서비스 워커 등록 (HTTPS 또는 localhost에서만 동작,
 * file:// 더블클릭 시에는 등록을 건너뛰어 경고를 남기지 않음)

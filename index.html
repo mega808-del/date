@@ -99,6 +99,7 @@ to { opacity: 1; transform: translateY(0); }
 </div>
 </nav>
 <main>
+<form autocomplete="off" onsubmit="return false">
 <!-- ===== 탭 1: 양력/음력 변환 ===== -->
 <section id="panel-solar" class="tab-panel mt-5 hidden">
 <div class="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
@@ -177,7 +178,7 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 </div>
 <div>
 <label class="mb-1.5 block text-base font-semibold text-slate-700">더할 일수</label>
-<input id="dd-days" type="number"
+<input id="dd-days" type="number" autocomplete="off" spellcheck="false" inputmode="numeric"
 class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
 </div>
 </div>
@@ -239,7 +240,7 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 <div id="zz-grid" class="grid grid-cols-4 gap-2"></div>
 <div class="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100">
 <i data-lucide="search" class="w-4 h-4 shrink-0 text-slate-500"></i>
-<input id="zz-query" type="text"
+<input id="zz-query" type="text" autocomplete="off" spellcheck="false"
 class="w-full bg-transparent py-2.5 text-base text-slate-900 outline-none placeholder:text-slate-400" />
 </div>
 <div id="zz-live"></div>
@@ -275,6 +276,7 @@ class="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center jus
 <div id="mil-result"></div>
 </div>
 </section>
+</form>
 </main>
 <footer class="mt-10 text-center text-sm leading-relaxed text-slate-500">
 <p>lunar-javascript 기반 음력 변환 · 모든 계산은 브라우저에서 처리됩니다</p>

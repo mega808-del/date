@@ -5,7 +5,7 @@
  * ================================================================ */
 'use strict';
 
-var CACHE_NAME = 'date-calc-v2';
+var CACHE_NAME = 'date-calc-v3';
 var CDN_ORIGINS = ['https://cdn.tailwindcss.com', 'https://cdn.jsdelivr.net'];
 /* 핵심 자산: 앱 자체 + CDN 라이브러리(스타일·아이콘·음력)를 함께 캐시 → 첫 방문 후 오프라인 동작 */
 var CORE_ASSETS = [
@@ -50,10 +50,37 @@ function isCacheable(urlStr) {
   return CDN_ORIGINS.some(function (origin) { return urlStr.indexOf(origin) === 0; });
 }
 
-/* 요청: 캐시 우선, 없으면 네트워크 → 성공 시 캐시에 저장 */
+/* ================================================================
+ * 요청 처리
+ * - 내비게이션(페이지 자체): 네트워크 우선 → 배포 후 설치형 PWA도
+ *   항상 최신 index.html 을 받아오도록 보장. 실패 시 캐시로 폴백(오프라인).
+ * - 그 외 자산(CDN 등): 캐시 우선, 없으면 네트워크 → 성공 시 캐시에 저장.
+ * ================================================================ */
 self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET') return;
+  // 내비게이션 요청: 네트워크 우선 (최신 코드 반영)
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).then(function (res) {
+        if (!res.ok) throw new Error('bad response');
+        if (isCacheable(req.url)) {
+          var copy = res.clone();
+          caches.open(CACHE_NAME).then(function (cache) { cache.put(req, copy); });
+        }
+        return res;
+      }).catch(function () {
+        // 오프라인/오류 응답: 캐시된 index.html로 대체
+        return caches.match(req).then(function (hit) {
+          return hit || caches.match('./index.html').then(function (fallback) {
+            return fallback || Response.error();
+          });
+        });
+      })
+    );
+    return;
+  }
+  // 그 외 자산: 캐시 우선
   event.respondWith(
     caches.match(req).then(function (hit) {
       if (hit) return hit;
@@ -64,12 +91,6 @@ self.addEventListener('fetch', function (event) {
         }
         return res;
       }).catch(function () {
-        // 네트워크 실패 시: 화면(내비게이션)은 캐시된 index.html로 대체
-        if (req.mode === 'navigate') {
-          return caches.match('./index.html').then(function (fallback) {
-            return fallback || Response.error();
-          });
-        }
         return Response.error();
       });
     })
